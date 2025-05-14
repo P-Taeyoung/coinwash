@@ -1,5 +1,8 @@
 package pp.coinwash.user.domain.entity;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import jakarta.persistence.Entity;
@@ -24,14 +27,16 @@ public class Owner extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long ownerId;
 
-	private String id;
+	private String loginId;
 	private String password;
 	private String name;
 	private String phone;
 
+	private LocalDateTime deletedAt;
+
 	public static Owner of(OwnerSignUpDto dto) {
 		return Owner.builder()
-			.id(dto.id())
+			.loginId(dto.id())
 			.password(BCrypt.hashpw(dto.password(),BCrypt.gensalt()))
 			.name(dto.name())
 			.phone(dto.phone())

@@ -1,5 +1,8 @@
 package pp.coinwash.user.domain.entity;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import jakarta.persistence.Entity;
@@ -12,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pp.coinwash.common.entity.BaseEntity;
 import pp.coinwash.user.domain.dto.CustomerSignUpDto;
+import pp.coinwash.user.domain.dto.CustomerUpdateDto;
 
 @Entity
 @Getter
@@ -24,7 +28,7 @@ public class Customer extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long customerId;
 
-	private String id;
+	private String loginId;
 	private String password;
 	private String name;
 	private String phone;
@@ -35,9 +39,11 @@ public class Customer extends BaseEntity {
 	private Long latitude;
 	private Long longitude;
 
+	private LocalDateTime deletedAt;
+
 	public static Customer of(CustomerSignUpDto dto) {
 		return Customer.builder()
-			.id(dto.id())
+			.loginId(dto.id())
 			.password(BCrypt.hashpw(dto.password(), BCrypt.gensalt()))
 			.name(dto.name())
 			.phone(dto.phone())
@@ -46,6 +52,17 @@ public class Customer extends BaseEntity {
 			.latitude(dto.latitude())
 			.longitude(dto.longitude())
 			.build();
+	}
+
+	public void update(CustomerUpdateDto dto) {
+		this.phone = dto.phone();
+		this.address = dto.address();
+		this.latitude = dto.latitude();
+		this.longitude = dto.longitude();
+	}
+
+	public void delete() {
+		this.deletedAt = LocalDateTime.now();
 	}
 
 }
