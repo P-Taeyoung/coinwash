@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: coinwash
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/coinwash
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: user
+    password: 1234
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
