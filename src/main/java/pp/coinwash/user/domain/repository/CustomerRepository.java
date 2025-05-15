@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import pp.coinwash.user.domain.entity.Customer;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
+	Boolean existsByLoginId(String id);
 }
