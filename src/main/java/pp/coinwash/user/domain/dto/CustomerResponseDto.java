@@ -10,8 +10,8 @@ public record CustomerResponseDto(
 	String phone,
 	int points,
 	String address,
-	Long latitude,
-	Long longitude) {
+	Double latitude,
+	Double longitude) {
 
 	public static CustomerResponseDto from(Customer customer) {
 		return CustomerResponseDto.builder()

@@ -36,8 +36,8 @@ public class Customer extends BaseEntity {
 	private int points;
 
 	private String address;
-	private Long latitude;
-	private Long longitude;
+	private Double latitude;
+	private Double longitude;
 
 	private LocalDateTime deletedAt;
 

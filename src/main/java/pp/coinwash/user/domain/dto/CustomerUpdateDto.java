@@ -1,8 +1,11 @@
 package pp.coinwash.user.domain.dto;
 
+import lombok.Builder;
+
+@Builder
 public record CustomerUpdateDto(
 	String phone,
 	String address,
-	Long latitude,
-	Long longitude
+	Double latitude,
+	Double longitude
 ) {}
