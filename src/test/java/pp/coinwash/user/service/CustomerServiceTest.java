@@ -73,13 +73,13 @@ class CustomerServiceTest {
 	@Test
 	void signUp() {
 		//given
-		when(customerRepository.existsByLoginId(signUpDto.id())).thenReturn(false);
+		when(customerRepository.existsByLoginIdAndDeletedAtIsNull(signUpDto.id())).thenReturn(false);
 
 		//when
 		customerService.signUp(signUpDto);
 
 		//then
-		verify(customerRepository, times(1)).existsByLoginId(signUpDto.id());
+		verify(customerRepository, times(1)).existsByLoginIdAndDeletedAtIsNull(signUpDto.id());
 		verify(customerRepository).save(argThat(customer ->
 			customer.getLoginId().equals(signUpDto.id()) &&
 				customer.getName().equals(signUpDto.name()) &&
@@ -94,14 +94,14 @@ class CustomerServiceTest {
 	@Test
 	void getCustomer() {
 		//given
-		when(customerRepository.findById(anyLong())).thenReturn(Optional.ofNullable(customer));
+		when(customerRepository.findByCustomerIdAndDeletedAtIsNull(anyLong())).thenReturn(Optional.ofNullable(customer));
 
 		//when
 		CustomerResponseDto result = customerService.getCustomer(1L);
 
 		//then
 		assertNotNull(result);
-		verify(customerRepository, times(1)).findById(1L);
+		verify(customerRepository, times(1)).findByCustomerIdAndDeletedAtIsNull(1L);
 		assertEquals(CustomerResponseDto.from(customer), result);
 	}
 
@@ -109,13 +109,13 @@ class CustomerServiceTest {
 	@Test
 	void updateCustomer() {
 		//given
-		when(customerRepository.findById(anyLong())).thenReturn(Optional.ofNullable(customer));
+		when(customerRepository.findByCustomerIdAndDeletedAtIsNull(anyLong())).thenReturn(Optional.ofNullable(customer));
 
 		// when
 		customerService.updateCustomer(1L, updateDto);
 
 		// then
-		verify(customerRepository).findById(1L);
+		verify(customerRepository).findByCustomerIdAndDeletedAtIsNull(1L);
 
 
 		assertEquals(updateDto.phone(), customer.getPhone());
@@ -128,13 +128,13 @@ class CustomerServiceTest {
 	@Test
 	void deleteCustomer() {
 		//given
-		when(customerRepository.findById(anyLong())).thenReturn(Optional.ofNullable(customer));
+		when(customerRepository.findByCustomerIdAndDeletedAtIsNull(anyLong())).thenReturn(Optional.ofNullable(customer));
 
 		//when
 		customerService.deleteCustomer(1L);
 
 		//then
-		verify(customerRepository, times(1)).findById(1L);
+		verify(customerRepository, times(1)).findByCustomerIdAndDeletedAtIsNull(1L);
 
 		// 실제 삭제일자 데이터를 비교하기 위해서는 나노초는 빼고 비교해야 함.
 		assertEquals(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),

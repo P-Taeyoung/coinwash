@@ -36,13 +36,13 @@ public class CustomerService {
 	}
 
 	private void validateId(String Id) {
-		if (customerRepository.existsByLoginId(Id)) {
+		if (customerRepository.existsByLoginIdAndDeletedAtIsNull(Id)) {
 			throw new RuntimeException("이미 존재하는 아이디입니다.");
 		}
 	}
 
 	private Customer validateCustomer(long customerId) {
-		return customerRepository.findById(customerId)
+		return customerRepository.findByCustomerIdAndDeletedAtIsNull(customerId)
 			.orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
 	}
 }
