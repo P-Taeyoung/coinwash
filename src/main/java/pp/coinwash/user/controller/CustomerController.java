@@ -23,7 +23,7 @@ public class CustomerController {
 
 	private final CustomerService customerService;
 
-	@PostMapping
+	@PostMapping("/signup")
 	public ResponseEntity<String> saveCustomer(@RequestBody CustomerSignUpDto dto) {
 		customerService.signUp(dto);
 		return ResponseEntity.ok("회원가입이 완료되었습니다.");
