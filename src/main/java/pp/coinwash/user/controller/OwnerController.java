@@ -11,40 +11,40 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import pp.coinwash.user.domain.dto.CustomerResponseDto;
-import pp.coinwash.user.domain.dto.CustomerSignUpDto;
-import pp.coinwash.user.domain.dto.CustomerUpdateDto;
-import pp.coinwash.user.service.CustomerService;
+import pp.coinwash.user.domain.dto.OwnerResponseDto;
+import pp.coinwash.user.domain.dto.OwnerSignUpDto;
+import pp.coinwash.user.domain.dto.OwnerUpdateDto;
+import pp.coinwash.user.service.OwnerService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/customer")
-public class CustomerController {
+@RequestMapping("/owner")
+public class OwnerController {
 
-	private final CustomerService customerService;
+	private final OwnerService ownerService;
 
 	@PostMapping("/signup")
-	public ResponseEntity<String> saveCustomer(@RequestBody CustomerSignUpDto dto) {
-		customerService.signUp(dto);
+	public ResponseEntity<String> saveCustomer(@RequestBody OwnerSignUpDto dto) {
+		ownerService.ownerSignUp(dto);
 		return ResponseEntity.ok("회원가입이 완료되었습니다.");
 	}
 
 	@GetMapping
 	//TODO 추후 ContextHolder 에서 고객id 를 가져올 수 있도록
-	public ResponseEntity<CustomerResponseDto> getCustomers(@RequestParam long customerId) {
-		return ResponseEntity.ok(customerService.getCustomer(customerId));
+	public ResponseEntity<OwnerResponseDto> getCustomers(@RequestParam long ownerId) {
+		return ResponseEntity.ok(ownerService.getOwner(ownerId));
 	}
 
 	@PatchMapping
-	public ResponseEntity<String> updateCustomer(@RequestParam long customerId
-		,@RequestBody CustomerUpdateDto dto) {
-		customerService.updateCustomer(customerId, dto);
+	public ResponseEntity<String> updateCustomer(@RequestParam long ownerId
+		,@RequestBody OwnerUpdateDto dto) {
+		ownerService.updateOwner(ownerId, dto);
 		return ResponseEntity.ok("회원정보가 수정되었습니다.");
 	}
 
 	@DeleteMapping
-	public ResponseEntity<String> deleteCustomer(@RequestParam long customerId) {
-		customerService.deleteCustomer(customerId);
+	public ResponseEntity<String> deleteCustomer(@RequestParam long ownerId) {
+		ownerService.deleteOwner(ownerId);
 		return ResponseEntity.ok("회원 탈퇴되었습니다.");
 	}
 }

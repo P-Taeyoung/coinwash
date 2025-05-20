@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pp.coinwash.common.entity.BaseEntity;
 import pp.coinwash.user.domain.dto.OwnerSignUpDto;
+import pp.coinwash.user.domain.dto.OwnerUpdateDto;
 
 @Entity
 @Getter
@@ -41,5 +42,13 @@ public class Owner extends BaseEntity {
 			.name(dto.name())
 			.phone(dto.phone())
 			.build();
+	}
+
+	public void update(OwnerUpdateDto dto) {
+		this.phone = dto.phone();
+	}
+
+	public void delete() {
+		this.deletedAt = LocalDateTime.now();
 	}
 }
