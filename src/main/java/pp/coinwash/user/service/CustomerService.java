@@ -1,10 +1,14 @@
 package pp.coinwash.user.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import pp.coinwash.security.JwtProvider;
+import pp.coinwash.security.dto.UserAuthDto;
 import pp.coinwash.user.domain.dto.CustomerResponseDto;
+import pp.coinwash.user.domain.dto.CustomerSignInDto;
 import pp.coinwash.user.domain.dto.CustomerSignUpDto;
 import pp.coinwash.user.domain.dto.CustomerUpdateDto;
 import pp.coinwash.user.domain.entity.Customer;
@@ -15,10 +19,22 @@ import pp.coinwash.user.domain.repository.CustomerRepository;
 public class CustomerService {
 
 	private final CustomerRepository customerRepository;
+	private final JwtProvider jwtProvider;
+	private final PasswordEncoder passwordEncoder;
 
 	public void signUp(CustomerSignUpDto dto) {
-		validateId(dto.id());
-		customerRepository.save(Customer.of(dto));
+		existsId(dto.id());
+		customerRepository.save(Customer.of(dto, passwordEncoder));
+	}
+
+	public String signIn(CustomerSignInDto dto) {
+		Customer customer = validateId(dto.customerSignInId());
+
+		if (!passwordEncoder.matches(dto.password(), customer.getPassword())) {
+			throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+		}
+
+		return jwtProvider.generateToken(UserAuthDto.fromCustomer(customer));
 	}
 
 	public CustomerResponseDto getCustomer(long customerId) {
@@ -35,8 +51,13 @@ public class CustomerService {
 		validateCustomer(customerId).delete();
 	}
 
-	private void validateId(String Id) {
-		if (customerRepository.existsByLoginIdAndDeletedAtIsNull(Id)) {
+	private Customer validateId(String id) {
+		return customerRepository.findByLoginIdAndDeletedAtIsNull(id)
+			.orElseThrow(() -> new RuntimeException("아이디 혹은 비밀번호가 일치하지 않습니다."));
+	}
+
+	private void existsId(String id) {
+		if (customerRepository.existsByLoginIdAndDeletedAtIsNull(id)) {
 			throw new RuntimeException("이미 존재하는 아이디입니다.");
 		}
 	}

@@ -9,6 +9,7 @@ import pp.coinwash.user.domain.entity.Customer;
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 	Boolean existsByLoginIdAndDeletedAtIsNull(String id);
 	Optional<Customer> findByCustomerIdAndDeletedAtIsNull(Long id);
+	Optional<Customer> findByLoginIdAndDeletedAtIsNull(String loginId);
 
 
 }

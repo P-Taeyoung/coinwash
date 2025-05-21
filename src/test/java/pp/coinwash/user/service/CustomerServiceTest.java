@@ -1,13 +1,5 @@
 package pp.coinwash.user.service;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -15,7 +7,19 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import pp.coinwash.security.JwtProvider;
+import pp.coinwash.security.dto.UserAuthDto;
 import pp.coinwash.user.domain.dto.CustomerResponseDto;
+import pp.coinwash.user.domain.dto.CustomerSignInDto;
 import pp.coinwash.user.domain.dto.CustomerSignUpDto;
 import pp.coinwash.user.domain.dto.CustomerUpdateDto;
 import pp.coinwash.user.domain.entity.Customer;
@@ -27,17 +31,28 @@ class CustomerServiceTest {
 	@Mock
 	private CustomerRepository customerRepository;
 
+	@Mock
+	private JwtProvider jwtProvider;
+
+	@Mock
+	private PasswordEncoder passwordEncoder;
+
 	@InjectMocks
 	private CustomerService customerService;
 
 
-
+	private CustomerSignInDto signInDto;
 	private CustomerSignUpDto signUpDto;
 	private CustomerUpdateDto updateDto;
 	private Customer customer;
 
 	@BeforeEach
 	void setUp() {
+
+		signInDto = CustomerSignInDto.builder()
+			.customerSignInId("qwe123")
+			.password("1234")
+			.build();
 
 		signUpDto = CustomerSignUpDto.builder()
 			.id("id")
@@ -67,6 +82,22 @@ class CustomerServiceTest {
 			.longitude(124.12)
 			.build();
 
+	}
+
+	@DisplayName("로그인")
+	@Test
+	void signIn() {
+		//given
+		when(customerRepository.findByLoginIdAndDeletedAtIsNull(signInDto.customerSignInId()))
+			.thenReturn(Optional.of(customer));
+		when(passwordEncoder.matches(signInDto.password(), customer.getPassword()))
+			.thenReturn(true);
+
+		//when
+		customerService.signIn(signInDto);
+
+		//then
+		verify(jwtProvider, times(1)).generateToken(UserAuthDto.fromCustomer(customer));
 	}
 
 	@DisplayName("회원가입 성공")
