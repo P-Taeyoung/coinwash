@@ -9,5 +9,6 @@ import pp.coinwash.user.domain.entity.Owner;
 public interface OwnerRepository extends JpaRepository<Owner, Long> {
 	Boolean existsByLoginIdAndDeletedAtIsNull(String id);
 	Optional<Owner> findByOwnerIdAndDeletedAtIsNull(Long id);
+	Optional<Owner> findByLoginIdAndDeletedAtIsNull(String ownerId);
 
 }
