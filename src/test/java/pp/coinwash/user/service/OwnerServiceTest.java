@@ -14,10 +14,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import pp.coinwash.security.JwtProvider;
+import pp.coinwash.security.dto.UserAuthDto;
 import pp.coinwash.user.domain.dto.OwnerResponseDto;
 import pp.coinwash.user.domain.dto.OwnerSignUpDto;
 import pp.coinwash.user.domain.dto.OwnerUpdateDto;
+import pp.coinwash.user.domain.dto.UserSignInDto;
 import pp.coinwash.user.domain.entity.Owner;
 import pp.coinwash.user.domain.repository.OwnerRepository;
 
@@ -27,15 +31,27 @@ class OwnerServiceTest {
 	@Mock
 	private OwnerRepository ownerRepository;
 
+	@Mock
+	private PasswordEncoder passwordEncoder;
+
+	@Mock
+	private JwtProvider jwtProvider;
+
 	@InjectMocks
 	private OwnerService ownerService;
 
 	private Owner owner;
 	private OwnerUpdateDto updateDto;
 	private OwnerSignUpDto signUpDto;
+	private UserSignInDto signInDto;
 
 	@BeforeEach
 	void setUp() {
+
+		signInDto = UserSignInDto.builder()
+			.signInId("qwe123")
+			.password("1234")
+			.build();
 
 		signUpDto = OwnerSignUpDto.builder()
 			.id("qwe123")
@@ -56,6 +72,21 @@ class OwnerServiceTest {
 			.phone("010-2222-5555")
 			.build();
 
+	}
+	@DisplayName("점주 로그인")
+	@Test
+	void signIn() {
+		//given
+		when(ownerRepository.findByLoginIdAndDeletedAtIsNull(signInDto.signInId()))
+			.thenReturn(Optional.of(owner));
+		when(passwordEncoder.matches(signInDto.password(), owner.getPassword()))
+			.thenReturn(true);
+
+		//when
+		ownerService.ownerSignIn(signInDto);
+
+		//then
+		verify(jwtProvider, times(1)).generateToken(UserAuthDto.fromOwner(owner));
 	}
 
 	@DisplayName("점주 회원가입")

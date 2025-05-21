@@ -1,9 +1,8 @@
 package pp.coinwash.user.domain.entity;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,10 +34,10 @@ public class Owner extends BaseEntity {
 
 	private LocalDateTime deletedAt;
 
-	public static Owner of(OwnerSignUpDto dto) {
+	public static Owner of(OwnerSignUpDto dto, PasswordEncoder passwordEncoder) {
 		return Owner.builder()
 			.loginId(dto.id())
-			.password(BCrypt.hashpw(dto.password(),BCrypt.gensalt()))
+			.password(passwordEncoder.encode(dto.password()))
 			.name(dto.name())
 			.phone(dto.phone())
 			.build();

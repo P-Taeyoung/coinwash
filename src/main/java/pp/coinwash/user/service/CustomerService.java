@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import pp.coinwash.security.JwtProvider;
 import pp.coinwash.security.dto.UserAuthDto;
 import pp.coinwash.user.domain.dto.CustomerResponseDto;
-import pp.coinwash.user.domain.dto.CustomerSignInDto;
+import pp.coinwash.user.domain.dto.UserSignInDto;
 import pp.coinwash.user.domain.dto.CustomerSignUpDto;
 import pp.coinwash.user.domain.dto.CustomerUpdateDto;
 import pp.coinwash.user.domain.entity.Customer;
@@ -27,8 +27,8 @@ public class CustomerService {
 		customerRepository.save(Customer.of(dto, passwordEncoder));
 	}
 
-	public String signIn(CustomerSignInDto dto) {
-		Customer customer = validateId(dto.customerSignInId());
+	public String signIn(UserSignInDto dto) {
+		Customer customer = validateId(dto.signInId());
 
 		if (!passwordEncoder.matches(dto.password(), customer.getPassword())) {
 			throw new RuntimeException("비밀번호가 일치하지 않습니다.");
