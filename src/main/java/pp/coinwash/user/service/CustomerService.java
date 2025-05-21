@@ -28,13 +28,8 @@ public class CustomerService {
 	}
 
 	public String signIn(UserSignInDto dto) {
-		Customer customer = validateId(dto.signInId());
 
-		if (!passwordEncoder.matches(dto.password(), customer.getPassword())) {
-			throw new RuntimeException("비밀번호가 일치하지 않습니다.");
-		}
-
-		return jwtProvider.generateToken(UserAuthDto.fromCustomer(customer));
+		return jwtProvider.generateToken(UserAuthDto.fromCustomer(validateId(dto)));
 	}
 
 	public CustomerResponseDto getCustomer(long customerId) {
@@ -51,9 +46,15 @@ public class CustomerService {
 		validateCustomer(customerId).delete();
 	}
 
-	private Customer validateId(String id) {
-		return customerRepository.findByLoginIdAndDeletedAtIsNull(id)
-			.orElseThrow(() -> new RuntimeException("아이디 혹은 비밀번호가 일치하지 않습니다."));
+	private Customer validateId(UserSignInDto dto) {
+		Customer customer =  customerRepository.findByLoginIdAndDeletedAtIsNull(dto.signInId())
+			.orElseThrow(() -> new RuntimeException("일치하는 아이디가 없습니다."));
+
+		if (!passwordEncoder.matches(dto.password(), customer.getPassword())) {
+			throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+		}
+
+		return customer;
 	}
 
 	private void existsId(String id) {
