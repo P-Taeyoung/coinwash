@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import pp.coinwash.user.domain.dto.CustomerResponseDto;
-import pp.coinwash.user.domain.dto.CustomerSignInDto;
+import pp.coinwash.user.domain.dto.UserSignInDto;
 import pp.coinwash.user.domain.dto.CustomerSignUpDto;
 import pp.coinwash.user.domain.dto.CustomerUpdateDto;
 import pp.coinwash.user.service.CustomerService;
@@ -25,7 +25,7 @@ public class CustomerController {
 	private final CustomerService customerService;
 
 	@PostMapping("/signin")
-	public ResponseEntity<String> signIn(@RequestBody CustomerSignInDto dto) {
+	public ResponseEntity<String> signIn(@RequestBody UserSignInDto dto) {
 
 		return ResponseEntity.ok(customerService.signIn(dto));
 	}
