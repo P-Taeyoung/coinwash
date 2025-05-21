@@ -3,8 +3,8 @@ package pp.coinwash.user.domain.dto;
 import lombok.Builder;
 
 @Builder
-public record CustomerSignInDto (
-	String customerSignInId,
+public record UserSignInDto(
+	String signInId,
 	String password
 ){
 }

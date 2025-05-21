@@ -19,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import pp.coinwash.security.JwtProvider;
 import pp.coinwash.security.dto.UserAuthDto;
 import pp.coinwash.user.domain.dto.CustomerResponseDto;
-import pp.coinwash.user.domain.dto.CustomerSignInDto;
+import pp.coinwash.user.domain.dto.UserSignInDto;
 import pp.coinwash.user.domain.dto.CustomerSignUpDto;
 import pp.coinwash.user.domain.dto.CustomerUpdateDto;
 import pp.coinwash.user.domain.entity.Customer;
@@ -41,7 +41,7 @@ class CustomerServiceTest {
 	private CustomerService customerService;
 
 
-	private CustomerSignInDto signInDto;
+	private UserSignInDto signInDto;
 	private CustomerSignUpDto signUpDto;
 	private CustomerUpdateDto updateDto;
 	private Customer customer;
@@ -49,8 +49,8 @@ class CustomerServiceTest {
 	@BeforeEach
 	void setUp() {
 
-		signInDto = CustomerSignInDto.builder()
-			.customerSignInId("qwe123")
+		signInDto = UserSignInDto.builder()
+			.signInId("qwe123")
 			.password("1234")
 			.build();
 
@@ -88,7 +88,7 @@ class CustomerServiceTest {
 	@Test
 	void signIn() {
 		//given
-		when(customerRepository.findByLoginIdAndDeletedAtIsNull(signInDto.customerSignInId()))
+		when(customerRepository.findByLoginIdAndDeletedAtIsNull(signInDto.signInId()))
 			.thenReturn(Optional.of(customer));
 		when(passwordEncoder.matches(signInDto.password(), customer.getPassword()))
 			.thenReturn(true);
