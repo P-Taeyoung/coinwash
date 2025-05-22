@@ -42,7 +42,7 @@ public class Laundry extends BaseEntity {
 	//주소 이름
 	private String addressName;
 	//위도, 경도 정보
-	@Column(columnDefinition = "POINT SRID 4326")
+	@Column(columnDefinition = "POINT SRID 4326", nullable = false)
 	private Point location;
 	//설명
 	private String description;
