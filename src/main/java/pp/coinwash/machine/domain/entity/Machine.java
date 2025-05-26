@@ -1,0 +1,52 @@
+package pp.coinwash.machine.domain.entity;
+
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import pp.coinwash.common.entity.BaseEntity;
+import pp.coinwash.laundry.domain.entity.Laundry;
+import pp.coinwash.machine.domain.type.MachineType;
+import pp.coinwash.machine.domain.type.UsageStatus;
+
+@Entity
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class Machine extends BaseEntity {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long machineId;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "laundry_id", nullable = false)
+	private Laundry laundry;
+
+	@Enumerated(EnumType.STRING)
+	private MachineType machineType;
+
+	@Enumerated(EnumType.STRING)
+	private UsageStatus usageStatus;
+
+	//기계 사용&에약 종료 시간
+	private LocalDateTime endTime;
+
+	//예약자 정보
+	private Long customerId;
+
+	//비고
+	private String notes;
+}
