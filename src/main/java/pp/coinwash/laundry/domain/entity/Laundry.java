@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -74,7 +75,7 @@ public class Laundry extends BaseEntity {
 	}
 
 	private static Point createPoint(double longitude, double latitude) {
-		GeometryFactory geometryFactory = new GeometryFactory();
+		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 		return geometryFactory.createPoint(new Coordinate(longitude, latitude));
 	}
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import pp.coinwash.common.dto.PagedResponseDto;
 import pp.coinwash.laundry.domain.dto.LaundryRegisterDto;
 import pp.coinwash.laundry.domain.dto.LaundryResponseDto;
@@ -14,6 +15,7 @@ import pp.coinwash.laundry.domain.repository.LaundryRepository;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LaundryManageService {
 
 	private final LaundryRepository laundryRepository;
@@ -48,7 +50,7 @@ public class LaundryManageService {
 	}
 
 	private void isAbleToRegister(LaundryRegisterDto dto) {
-		if(laundryRepository.existsWithinDistance(dto.latitude(), dto.longitude(), 500)) {
+		if(laundryRepository.existsWithinDistance(dto.longitude(), dto.latitude(), 500)) {
 			throw new RuntimeException("500m 내 이미 코인 세탁방이 존재합니다.");
 		}
 	}
