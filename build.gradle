@@ -29,10 +29,17 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'mysql:mysql-connector-java:8.0.32'
 
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.1'
+
     //jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+    //jts
+    implementation 'org.hibernate:hibernate-spatial:6.4.1.Final'
+    implementation 'org.locationtech.jts:jts-core:1.19.0'
+
 
 
     compileOnly 'org.projectlombok:lombok'
