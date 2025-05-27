@@ -52,9 +52,9 @@ public class MachineManageController {
 
 	@DeleteMapping
 	public ResponseEntity<String> deleteMachine(
-		@RequestParam long laundryId,
+		@RequestParam long machineId,
 		@RequestParam long ownerId) {
-		machineManageService.deleteMachine(laundryId, ownerId);
+		machineManageService.deleteMachine(machineId, ownerId);
 		return ResponseEntity.ok("기계정보가 정상적으로 삭제되었습니다.");
 	}
 
