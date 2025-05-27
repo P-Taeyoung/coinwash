@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import pp.coinwash.laundry.domain.entity.Laundry;
@@ -33,15 +34,17 @@ public class MachineManageService {
 	public List<MachineResponseDto> getMachinesByLaundryId(long laundryId, long ownerId) {
 		verifyValidateLaundry(laundryId, ownerId);
 
-		List<Machine> machines = machineRepository.findByLaundryLaundryId(laundryId);
+		List<Machine> machines = machineRepository.findByLaundryLaundryIdAndDeletedAtIsNull(laundryId);
 
 		return machines.stream().map(MachineResponseDto::from).collect(Collectors.toList());
 	}
 
+	@Transactional
 	public void updateMachine(MachineUpdateDto updateDto, long ownerId) {
 		getValidateMachine(updateDto.machineId(), ownerId).updateOf(updateDto);
 	}
 
+	@Transactional
 	public void deleteMachine(long machineId, long ownerId) {
 		getValidateMachine(machineId, ownerId).delete();
 	}

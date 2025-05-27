@@ -113,14 +113,14 @@ class MachineManageServiceTest {
 		long laundryId = 1L;
 		when(laundryRepository.existsByLaundryIdAndOwnerIdAndDeletedAtIsNull(laundryId, ownerId))
 			.thenReturn(true);
-		when(machineRepository.findByLaundryLaundryId(laundryId))
+		when(machineRepository.findByLaundryLaundryIdAndDeletedAtIsNull(laundryId))
 			.thenReturn(List.of(machine1, machine2));
 
 		//when
 		List<MachineResponseDto> machines = machineManageService.getMachinesByLaundryId(laundryId, ownerId);
 
 		//then
-        verify(machineRepository, times(1)).findByLaundryLaundryId(laundryId);
+        verify(machineRepository, times(1)).findByLaundryLaundryIdAndDeletedAtIsNull(laundryId);
 		assertEquals(2, machines.size());
 		assertEquals(MachineResponseDto.from(machine1), machines.get(0));
 		assertEquals(MachineResponseDto.from(machine2), machines.get(1));
