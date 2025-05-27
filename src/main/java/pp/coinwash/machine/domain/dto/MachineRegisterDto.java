@@ -5,7 +5,6 @@ import pp.coinwash.machine.domain.type.MachineType;
 
 @Builder
 public record MachineRegisterDto(
-	Long laundryId,
 	MachineType machineType,
 	String notes
 ) {
