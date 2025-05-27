@@ -21,6 +21,7 @@ public record MachineResponseDto(
 			.machineType(machine.getMachineType())
 			.usageStatus(machine.getUsageStatus())
 			.endTime(machine.getEndTime())
+			.notes(machine.getNotes())
 			.build();
 	}
 }
