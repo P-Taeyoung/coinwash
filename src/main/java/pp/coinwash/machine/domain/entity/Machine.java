@@ -17,6 +17,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pp.coinwash.common.entity.BaseEntity;
 import pp.coinwash.laundry.domain.entity.Laundry;
+import pp.coinwash.machine.domain.dto.MachineRegisterDto;
+import pp.coinwash.machine.domain.dto.MachineUpdateDto;
 import pp.coinwash.machine.domain.type.MachineType;
 import pp.coinwash.machine.domain.type.UsageStatus;
 
@@ -49,4 +51,26 @@ public class Machine extends BaseEntity {
 
 	//비고
 	private String notes;
+
+	private LocalDateTime deletedAt;
+
+	public static Machine of(MachineRegisterDto dto, Laundry laundry) {
+		return Machine.builder()
+			.laundry(laundry)
+			.machineType(dto.machineType())
+			.usageStatus(UsageStatus.USABLE)
+			.endTime(null)
+			.customerId(null)
+			.notes(dto.notes())
+			.build();
+	}
+
+	public void updateOf(MachineUpdateDto dto) {
+		this.usageStatus = dto.usageStatus();
+		this.notes = dto.notes();
+	}
+
+	public void delete() {
+		this.deletedAt = LocalDateTime.now();
+	}
 }
