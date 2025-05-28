@@ -21,23 +21,23 @@ import org.springframework.data.domain.Pageable;
 import pp.coinwash.common.dto.PagedResponseDto;
 import pp.coinwash.laundry.domain.entity.Laundry;
 import pp.coinwash.machine.domain.entity.Machine;
-import pp.coinwash.history.domain.dto.UsageHistoryRequestDto;
-import pp.coinwash.history.domain.dto.UsageHistoryResponseDto;
-import pp.coinwash.history.domain.entity.UsageHistory;
-import pp.coinwash.history.domain.repository.UsageHistoryRepository;
+import pp.coinwash.history.domain.dto.HistoryRequestDto;
+import pp.coinwash.history.domain.dto.HistoryResponseDto;
+import pp.coinwash.history.domain.entity.History;
+import pp.coinwash.history.domain.repository.HistoryRepository;
 
 @ExtendWith(MockitoExtension.class)
-class UsageHistoryServiceTest {
+class HistoryServiceTest {
 
 	@Mock
-	private UsageHistoryRepository usageHistoryRepository;
+	private HistoryRepository historyRepository;
 
 	@InjectMocks
-	private UsageHistoryService usageHistoryService;
+	private HistoryService historyService;
 
-	private UsageHistory usageHistory1;
-	private UsageHistoryResponseDto responseDto;
-	private UsageHistoryRequestDto requestDto;
+	private History history1;
+	private HistoryResponseDto responseDto;
+	private HistoryRequestDto requestDto;
 	private Pageable pageable;
 	private Machine machine;
 	private Laundry laundry;
@@ -58,13 +58,13 @@ class UsageHistoryServiceTest {
 			.build();
 
 
-		usageHistory1 = UsageHistory.builder()
+		history1 = History.builder()
 			.historyId(1)
 			.machine(machine)
 			.customerId(1)
 			.build();
 
-		requestDto = UsageHistoryRequestDto.builder()
+		requestDto = HistoryRequestDto.builder()
 			.customerId(1)
 			.build();
 	}
@@ -74,16 +74,16 @@ class UsageHistoryServiceTest {
 	void createUsageHistory() {
 		//given
 		//when
-		usageHistoryService.createUsageHistory(requestDto, machine);
+		historyService.createUsageHistory(requestDto, machine);
 
 		//then
-		ArgumentCaptor<UsageHistory> captor = ArgumentCaptor.forClass(UsageHistory.class);
-		verify(usageHistoryRepository, times(1)).save(captor.capture());
+		ArgumentCaptor<History> captor = ArgumentCaptor.forClass(History.class);
+		verify(historyRepository, times(1)).save(captor.capture());
 
-		UsageHistory usageHistory = captor.getValue();
-		assertThat(usageHistory.getCustomerId()).isEqualTo(1);
-		assertThat(usageHistory.getMachine().getMachineId()).isEqualTo(2);
-		assertThat(usageHistory.getMachine().getLaundry().getLaundryId()).isEqualTo(3);
+		History history = captor.getValue();
+		assertThat(history.getCustomerId()).isEqualTo(1);
+		assertThat(history.getMachine().getMachineId()).isEqualTo(2);
+		assertThat(history.getMachine().getLaundry().getLaundryId()).isEqualTo(3);
 	}
 
 	@DisplayName("사용 내역 조회")
@@ -92,29 +92,29 @@ class UsageHistoryServiceTest {
 		//given
 		long customerId = 1;
 
-		UsageHistory usageHistory2 = UsageHistory.builder()
+		History history2 = History.builder()
 			.historyId(2)
 			.machine(machine)
 			.customerId(2)
 			.build();
-		UsageHistory usageHistory3 = UsageHistory.builder()
+		History history3 = History.builder()
 			.historyId(3)
 			.machine(machine)
 			.customerId(2)
 			.build();
 
-		List<UsageHistory> usageHistories = List.of(usageHistory1, usageHistory2, usageHistory3);
-		Page<UsageHistory> historyPage = new PageImpl<>(usageHistories, pageable, usageHistories.size());
-		when(usageHistoryRepository.findAllByCustomerId(customerId, pageable))
+		List<History> usageHistories = List.of(history1, history2, history3);
+		Page<History> historyPage = new PageImpl<>(usageHistories, pageable, usageHistories.size());
+		when(historyRepository.findAllByCustomerId(customerId, pageable))
 			.thenReturn(historyPage);
 
 		//when
-		PagedResponseDto<UsageHistoryResponseDto> result =
-			usageHistoryService.getUsageHistoriesByCustomerId(customerId, pageable);
+		PagedResponseDto<HistoryResponseDto> result =
+			historyService.getUsageHistoriesByCustomerId(customerId, pageable);
 
 		//then
-		verify(usageHistoryRepository, times(1)).findAllByCustomerId(customerId, pageable);
-		assertThat(PagedResponseDto.from(historyPage.map(UsageHistoryResponseDto::from))).isEqualTo(result);
+		verify(historyRepository, times(1)).findAllByCustomerId(customerId, pageable);
+		assertThat(PagedResponseDto.from(historyPage.map(HistoryResponseDto::from))).isEqualTo(result);
 		assertThat(usageHistories.size()).isEqualTo(3);
 		assertThat(usageHistories.get(2).getCustomerId()).isEqualTo(2);
 	}
