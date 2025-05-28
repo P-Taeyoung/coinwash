@@ -6,7 +6,6 @@ import lombok.Builder;
 
 @Builder
 public record UsageHistoryRequestDto(
-	long machineId,
 	long customerId,
 	LocalDateTime startTime,
 	LocalDateTime endTime
