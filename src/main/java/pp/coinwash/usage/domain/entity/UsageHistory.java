@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pp.coinwash.common.entity.BaseEntity;
 import pp.coinwash.machine.domain.entity.Machine;
+import pp.coinwash.usage.domain.dto.UsageHistoryRequestDto;
 
 @Entity
 @Getter
@@ -38,5 +39,12 @@ public class UsageHistory extends BaseEntity {
 	//사용 종료 시간
 	private LocalDateTime endTime;
 
-
+	public static UsageHistory of(UsageHistoryRequestDto requestDto, Machine machine) {
+		return UsageHistory.builder()
+			.machine(machine)
+			.customerId(requestDto.customerId())
+			.startTime(requestDto.startTime())
+			.endTime(requestDto.endTime())
+			.build();
+	}
 }
