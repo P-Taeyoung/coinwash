@@ -1,7 +1,7 @@
-package pp.coinwash.usage.domain.dto;
+package pp.coinwash.history.domain.dto;
 
 import lombok.Builder;
-import pp.coinwash.usage.domain.type.DryingCourse;
+import pp.coinwash.history.domain.type.DryingCourse;
 
 @Builder
 public record UsageDryingDto(

@@ -1,10 +1,9 @@
-package pp.coinwash.usage.domain.dto;
+package pp.coinwash.history.domain.dto;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import lombok.Builder;
-import pp.coinwash.usage.domain.entity.UsageHistory;
+import pp.coinwash.history.domain.entity.UsageHistory;
 
 @Builder
 public record UsageHistoryResponseDto(

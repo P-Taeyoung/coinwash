@@ -1,4 +1,4 @@
-package pp.coinwash.usage.domain.entity;
+package pp.coinwash.history.domain.entity;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pp.coinwash.common.entity.BaseEntity;
 import pp.coinwash.machine.domain.entity.Machine;
-import pp.coinwash.usage.domain.dto.UsageHistoryRequestDto;
+import pp.coinwash.history.domain.dto.UsageHistoryRequestDto;
 
 @Entity
 @Getter

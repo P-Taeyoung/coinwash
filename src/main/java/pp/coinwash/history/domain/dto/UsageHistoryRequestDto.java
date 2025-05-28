@@ -1,4 +1,4 @@
-package pp.coinwash.usage.domain.dto;
+package pp.coinwash.history.domain.dto;
 
 import java.time.LocalDateTime;
 
