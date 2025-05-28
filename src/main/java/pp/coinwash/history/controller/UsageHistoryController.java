@@ -1,4 +1,4 @@
-package pp.coinwash.usage.controller;
+package pp.coinwash.history.controller;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,11 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import pp.coinwash.common.dto.PagedResponseDto;
-import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.domain.repository.MachineRepository;
-import pp.coinwash.usage.domain.dto.UsageHistoryRequestDto;
-import pp.coinwash.usage.domain.dto.UsageHistoryResponseDto;
-import pp.coinwash.usage.service.UsageHistoryService;
+import pp.coinwash.history.domain.dto.UsageHistoryRequestDto;
+import pp.coinwash.history.domain.dto.UsageHistoryResponseDto;
+import pp.coinwash.history.service.UsageHistoryService;
 
 @RestController
 @RequiredArgsConstructor

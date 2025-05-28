@@ -1,4 +1,4 @@
-package pp.coinwash.usage.domain.type;
+package pp.coinwash.history.domain.type;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

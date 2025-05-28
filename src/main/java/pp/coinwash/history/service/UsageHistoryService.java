@@ -1,4 +1,4 @@
-package pp.coinwash.usage.service;
+package pp.coinwash.history.service;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import pp.coinwash.common.dto.PagedResponseDto;
 import pp.coinwash.machine.domain.entity.Machine;
-import pp.coinwash.usage.domain.dto.UsageHistoryRequestDto;
-import pp.coinwash.usage.domain.dto.UsageHistoryResponseDto;
-import pp.coinwash.usage.domain.entity.UsageHistory;
-import pp.coinwash.usage.domain.repository.UsageHistoryRepository;
+import pp.coinwash.history.domain.dto.UsageHistoryRequestDto;
+import pp.coinwash.history.domain.dto.UsageHistoryResponseDto;
+import pp.coinwash.history.domain.entity.UsageHistory;
+import pp.coinwash.history.domain.repository.UsageHistoryRepository;
 
 @Service
 @RequiredArgsConstructor
