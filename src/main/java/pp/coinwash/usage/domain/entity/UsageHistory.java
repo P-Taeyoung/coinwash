@@ -15,7 +15,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pp.coinwash.common.entity.BaseEntity;
 import pp.coinwash.machine.domain.entity.Machine;
-import pp.coinwash.machine.domain.type.MachineType;
 
 @Entity
 @Getter
