@@ -14,25 +14,25 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import pp.coinwash.common.dto.PagedResponseDto;
 import pp.coinwash.machine.domain.repository.MachineRepository;
-import pp.coinwash.history.domain.dto.UsageHistoryRequestDto;
-import pp.coinwash.history.domain.dto.UsageHistoryResponseDto;
-import pp.coinwash.history.service.UsageHistoryService;
+import pp.coinwash.history.domain.dto.HistoryRequestDto;
+import pp.coinwash.history.domain.dto.HistoryResponseDto;
+import pp.coinwash.history.service.HistoryService;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/usage-history")
-public class UsageHistoryController {
+public class HistoryController {
 
-	private final UsageHistoryService usageHistoryService;
+	private final HistoryService historyService;
 	private final MachineRepository machineRepository;
 
 	@GetMapping
-	public ResponseEntity<PagedResponseDto<UsageHistoryResponseDto>> getUsageHistories(
+	public ResponseEntity<PagedResponseDto<HistoryResponseDto>> getUsageHistories(
 		@RequestParam long customerId,
 		@PageableDefault(sort = "historyId", direction = Sort.Direction.DESC)
 		Pageable pageable) {
 
-		return ResponseEntity.ok(usageHistoryService
+		return ResponseEntity.ok(historyService
 			.getUsageHistoriesByCustomerId(customerId, pageable));
 	}
 
@@ -40,11 +40,11 @@ public class UsageHistoryController {
 	//TEST 용
 	@PostMapping
 	public ResponseEntity<String> createUsageHistory(
-		@RequestBody UsageHistoryRequestDto usageHistoryRequestDto
+		@RequestBody HistoryRequestDto historyRequestDto
 	) {
 		long machineId = 1;
 
-		usageHistoryService.createUsageHistory(usageHistoryRequestDto
+		historyService.createUsageHistory(historyRequestDto
 			, machineRepository.findById(machineId)
 				.orElseThrow(() -> new RuntimeException("Invalid machine id: " + machineId)));
 
