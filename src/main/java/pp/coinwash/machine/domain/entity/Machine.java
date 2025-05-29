@@ -16,6 +16,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pp.coinwash.common.entity.BaseEntity;
+import pp.coinwash.history.domain.type.DryingCourse;
+import pp.coinwash.history.domain.type.WashingCourse;
 import pp.coinwash.laundry.domain.entity.Laundry;
 import pp.coinwash.machine.domain.dto.MachineRegisterDto;
 import pp.coinwash.machine.domain.dto.MachineUpdateDto;
@@ -72,5 +74,23 @@ public class Machine extends BaseEntity {
 
 	public void delete() {
 		this.deletedAt = LocalDateTime.now();
+	}
+
+	public void useWashing(long customerId, WashingCourse course) {
+		this.customerId = customerId;
+		this.usageStatus = UsageStatus.USING;
+		this.endTime = LocalDateTime.now().plusMinutes(course.getCourseTime());
+	}
+
+	public void useDrying(long customerId, DryingCourse course) {
+		this.customerId = customerId;
+		this.usageStatus = UsageStatus.USING;
+		this.endTime = LocalDateTime.now().plusMinutes(course.getCourseTime());
+	}
+
+	public void reset() {
+		this.usageStatus = UsageStatus.USABLE;
+		this.endTime = null;
+		this.customerId = null;
 	}
 }
