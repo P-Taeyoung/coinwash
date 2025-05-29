@@ -17,4 +17,7 @@ public interface MachineRepository extends JpaRepository<Machine, Long> {
 	@Query("SELECT m FROM Machine m WHERE m.machineId = :machineId AND m.machineType = :machineTyp")
 	Optional<Machine> findMachineByMachineId(@Param("machineId") long machineId
 		, @Param("machineTyp") MachineType machineTyp);
+
+	@Query("SELECT m FROM Machine m WHERE m.machineId = :machineId AND m.usageStatus = 'USABLE'")
+	Optional<Machine> findUsableMachineByMachineId(long machineId);
 }
