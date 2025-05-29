@@ -88,6 +88,12 @@ public class Machine extends BaseEntity {
 		this.endTime = LocalDateTime.now().plusMinutes(course.getCourseTime());
 	}
 
+	public void reserve(long customerId) {
+		this.customerId = customerId;
+		this.usageStatus = UsageStatus.RESERVING;
+		this.endTime = LocalDateTime.now().plusMinutes(15);
+	}
+
 	public void reset() {
 		this.usageStatus = UsageStatus.USABLE;
 		this.endTime = null;
