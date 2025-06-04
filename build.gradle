@@ -47,6 +47,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 //    testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    //test 용 데이터 베이스
+    testImplementation 'com.h2database:h2'
+
 }
 
 tasks.named('test') {
