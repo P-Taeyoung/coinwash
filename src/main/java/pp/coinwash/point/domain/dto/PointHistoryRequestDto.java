@@ -9,6 +9,14 @@ public record PointHistoryRequestDto(
 	long customerId,
 	int changedPoint
 ) {
+	public static PointHistoryRequestDto usePoint(long customerId, int points) {
+		return PointHistoryRequestDto.builder()
+			.customerId(customerId)
+			.changedPoint(points)
+			.pointType(PointType.USED)
+			.build();
+	}
+
 	public static PointHistoryRequestDto earnPoint(long customerId, int points) {
 		return PointHistoryRequestDto.builder()
 			.customerId(customerId)
