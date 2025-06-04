@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,6 +41,9 @@ public class Customer extends BaseEntity {
 
 	private LocalDateTime deletedAt;
 
+	@Version
+	private Long version;
+
 	public static Customer of(CustomerSignUpDto dto, PasswordEncoder passwordEncoder) {
 		return Customer.builder()
 			.loginId(dto.id())
@@ -62,6 +66,14 @@ public class Customer extends BaseEntity {
 
 	public void delete() {
 		this.deletedAt = LocalDateTime.now();
+	}
+
+	public void usePoints(int points) {
+		this.points -= points;
+	}
+
+	public void earnPoints(int points) {
+		this.points += points;
 	}
 
 }
