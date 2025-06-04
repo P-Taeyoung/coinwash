@@ -16,6 +16,10 @@ spring:
   jwt:
     secret: "vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb"
 
+kakao:
+  api:
+    key: ${KAKAO_API_KEY}
+
 #logging:
 #  level:
 #    org:
