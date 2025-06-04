@@ -24,12 +24,17 @@ import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.domain.repository.MachineRepository;
 import pp.coinwash.machine.domain.type.MachineType;
 import pp.coinwash.machine.domain.type.UsageStatus;
+import pp.coinwash.point.application.PointHistoryApplication;
+import pp.coinwash.point.domain.dto.PointHistoryRequestDto;
 
 @ExtendWith(MockitoExtension.class)
 class UsingMachineServiceTest {
 
 	@Mock
 	private MachineRepository machineRepository;
+
+	@Mock
+	private PointHistoryApplication pointHistoryApplication;
 
 	@InjectMocks
 	private UsingMachineService usingMachineService;
@@ -82,6 +87,10 @@ class UsingMachineServiceTest {
 		usingMachineService.useWashing(customerId, washingDto);
 
 		//then
+		verify(pointHistoryApplication, times(1))
+			.usePoints(PointHistoryRequestDto.usePoint(customerId,
+				WashingCourse.WASHING_A_COURSE.getFee()));
+
 		verify(machineRepository, times(1)).findMachineByMachineId(1, MachineType.WASHING);
 		assertEquals(customerId, washingMachine.getCustomerId());
 		assertEquals(UsageStatus.USING, washingMachine.getUsageStatus());
@@ -108,6 +117,10 @@ class UsingMachineServiceTest {
 		usingMachineService.useDrying(customerId, dryingDto);
 
 		//then
+		verify(pointHistoryApplication, times(1))
+			.usePoints(PointHistoryRequestDto.usePoint(customerId,
+				DryingCourse.DRYING_A_COURSE.getFee()));
+
 		verify(machineRepository, times(1)).findMachineByMachineId(1, MachineType.DRYING);
 		assertEquals(customerId, dryingMachine.getCustomerId());
 		assertEquals(UsageStatus.USING, dryingMachine.getUsageStatus());
@@ -162,7 +175,7 @@ class UsingMachineServiceTest {
 		assertEquals("현재 사용할 수 없는 기계입니다.", exception.getMessage());
 	}
 
-	@DisplayName("사용할 수 없는 기계 예외")
+	@DisplayName("이미 예약되어 있는 기계")
 	@Test
 	void alreadyReservedMachine() {
 		//given
