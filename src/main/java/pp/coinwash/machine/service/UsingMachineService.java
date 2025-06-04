@@ -12,6 +12,8 @@ import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.domain.repository.MachineRepository;
 import pp.coinwash.machine.domain.type.MachineType;
 import pp.coinwash.machine.domain.type.UsageStatus;
+import pp.coinwash.point.application.PointHistoryApplication;
+import pp.coinwash.point.domain.dto.PointHistoryRequestDto;
 
 @Service
 @RequiredArgsConstructor
@@ -19,11 +21,17 @@ public class UsingMachineService {
 
 	private final MachineRepository machineRepository;
 
+	private final PointHistoryApplication pointHistoryApplication;
+
 	@Transactional
 	public void useWashing(long customerId, UsingWashingDto usingWashingDto) {
 
 		Machine machine = verifyUsableMachine(
 			usingWashingDto.machineId(), customerId, WASHING);
+
+		pointHistoryApplication.usePoints(
+			PointHistoryRequestDto.usePoint(customerId,
+				usingWashingDto.course().getFee()));
 
 		machine.useWashing(customerId, usingWashingDto.course());
 	}
@@ -33,6 +41,10 @@ public class UsingMachineService {
 
 		Machine machine = verifyUsableMachine(
 			usingDryingDto.machineId(), customerId, DRYING);
+
+		pointHistoryApplication.usePoints(
+			PointHistoryRequestDto.usePoint(customerId,
+				usingDryingDto.course().getFee()));
 
 		machine.useDrying(customerId, usingDryingDto.course());
 	}
@@ -58,9 +70,15 @@ public class UsingMachineService {
 		}
 
 		// 예약 중이라면 예약자 확인
-		if (machine.getUsageStatus() == UsageStatus.RESERVING
-		&& machine.getCustomerId() != customerId) {
-			throw new RuntimeException("예약자가 아닙니다.");
+		if (machine.getUsageStatus() == UsageStatus.RESERVING) {
+
+			if (machine.getCustomerId() != customerId) {
+				throw new RuntimeException("예약자가 아닙니다.");
+			}
+			//예약금 환급
+			pointHistoryApplication.earnPoints(
+				PointHistoryRequestDto.earnPoint(customerId,
+					100));
 		}
 
 		return machine;

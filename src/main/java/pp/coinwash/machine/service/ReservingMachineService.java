@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.domain.repository.MachineRepository;
 import pp.coinwash.machine.domain.type.UsageStatus;
+import pp.coinwash.point.application.PointHistoryApplication;
+import pp.coinwash.point.domain.dto.PointHistoryRequestDto;
 
 @Service
 @RequiredArgsConstructor
@@ -14,8 +16,14 @@ public class ReservingMachineService {
 
 	private final MachineRepository machineRepository;
 
+	private final PointHistoryApplication pointHistoryApplication;
+
 	@Transactional
 	public void reserveMachine(long machineId, long customerId) {
+
+		//예약금
+		pointHistoryApplication.usePoints(
+			PointHistoryRequestDto.usePoint(customerId, 100));
 
 		getCanReserveMachine(machineId).reserve(customerId);
 	}
