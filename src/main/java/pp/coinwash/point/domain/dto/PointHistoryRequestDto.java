@@ -9,4 +9,11 @@ public record PointHistoryRequestDto(
 	long customerId,
 	int changedPoint
 ) {
+	public static PointHistoryRequestDto earnPoint(long customerId, int points) {
+		return PointHistoryRequestDto.builder()
+			.customerId(customerId)
+			.changedPoint(points)
+			.pointType(PointType.EARNED)
+			.build();
+	}
 }
