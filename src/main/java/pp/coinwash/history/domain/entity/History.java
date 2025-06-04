@@ -35,6 +35,7 @@ public class History extends BaseEntity {
 	@JoinColumn(name = "machine_id", nullable = false)
 	private Machine machine;
 
+	//TODO 추후 인덱스 설정 추가
 	private long customerId;
 
 	//예약 or 사용 내역
