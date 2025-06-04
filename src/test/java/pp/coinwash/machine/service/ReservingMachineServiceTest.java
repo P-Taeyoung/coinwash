@@ -14,15 +14,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import pp.coinwash.history.domain.type.WashingCourse;
 import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.domain.repository.MachineRepository;
 import pp.coinwash.machine.domain.type.UsageStatus;
+import pp.coinwash.point.application.PointHistoryApplication;
+import pp.coinwash.point.domain.dto.PointHistoryRequestDto;
 
 @ExtendWith(MockitoExtension.class)
 class ReservingMachineServiceTest {
 
 	@Mock
 	private MachineRepository machineRepository;
+
+	@Mock
+	private PointHistoryApplication pointHistoryApplication;
 
 	@InjectMocks
 	private ReservingMachineService reservingMachineService;
@@ -50,6 +56,10 @@ class ReservingMachineServiceTest {
 		reservingMachineService.reserveMachine(machineId, customerId);
 
 		//then
+		verify(pointHistoryApplication, times(1))
+			.usePoints(PointHistoryRequestDto.usePoint(customerId,
+				100));
+
 		verify(machineRepository, times(1)).findUsableMachineByMachineId(machineId);
 		assertEquals(customerId, machine.getCustomerId());
 		assertEquals(LocalDateTime.now().plusMinutes(15).truncatedTo(ChronoUnit.SECONDS)
