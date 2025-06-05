@@ -54,12 +54,6 @@ public class MachineManageService {
 			.orElseThrow(() -> new RuntimeException("해당하는 세탁소 정보를 찾을 수 없습니다."));
 	}
 
-	private void verifyValidateLaundry(long laundryId, long ownerId) {
-		if (!laundryRepository.existsByLaundryIdAndOwnerIdAndDeletedAtIsNull(laundryId, ownerId)) {
-			throw new RuntimeException("세탁소Id, 점장Id 와일치하는 세탁소 정보를 찾을 수 없습니다.");
-		}
-	}
-
 	private Machine getValidateMachine(long machineId, long ownerId) {
 
 		return machineRepository.findByMachineIdAndLaundryOwnerId(machineId, ownerId)

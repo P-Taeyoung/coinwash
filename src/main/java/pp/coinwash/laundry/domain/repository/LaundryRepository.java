@@ -13,7 +13,6 @@ import pp.coinwash.laundry.domain.entity.Laundry;
 public interface LaundryRepository extends JpaRepository<Laundry, Long> {
 	Page<Laundry> findByOwnerIdAndDeletedAtIsNull(long ownerId, Pageable pageable);
 	Optional<Laundry> findByLaundryIdAndOwnerIdAndDeletedAtIsNull(long laundryId, long ownerId);
-	boolean existsByLaundryIdAndOwnerIdAndDeletedAtIsNull(long laundryId, long ownerId);
 
 	@Query(value = "SELECT COUNT(l) > 0 FROM Laundry l " +
 		"WHERE ST_Distance_Sphere(l.location, " +
