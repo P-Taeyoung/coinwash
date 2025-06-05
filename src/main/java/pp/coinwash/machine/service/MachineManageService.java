@@ -31,8 +31,7 @@ public class MachineManageService {
 		}
 	}
 
-	public List<MachineResponseDto> getMachinesByLaundryId(long laundryId, long ownerId) {
-		verifyValidateLaundry(laundryId, ownerId);
+	public List<MachineResponseDto> getMachinesByLaundryId(long laundryId) {
 
 		List<Machine> machines = machineRepository.findByLaundryLaundryIdAndDeletedAtIsNull(laundryId);
 
