@@ -61,7 +61,7 @@ public class UsingMachineService {
 
 	private Machine verifyUsableMachine(long machineId, long customerId, MachineType machineType) {
 
-		Machine machine = machineRepository.findMachineByMachineId(machineId, machineType)
+		Machine machine = machineRepository.findUsableMachineWithLock(machineId, machineType)
 			.orElseThrow(() -> new RuntimeException("해당하는 기계 정보가 없습니다."));
 
 		if (machine.getUsageStatus() == UsageStatus.USING
