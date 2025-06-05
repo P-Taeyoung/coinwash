@@ -22,3 +22,7 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+kakao:
+  api:
+    key: ${KAKAO_API_KEY}

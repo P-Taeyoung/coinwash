@@ -80,7 +80,7 @@ class UsingMachineServiceTest {
 			.machineId(1)
 			.course(WashingCourse.WASHING_A_COURSE)
 			.build();
-		when(machineRepository.findMachineByMachineId(1, MachineType.WASHING))
+		when(machineRepository.findUsableMachineWithLock(1, MachineType.WASHING))
 			.thenReturn(Optional.ofNullable(washingMachine));
 
 		//when
@@ -91,7 +91,7 @@ class UsingMachineServiceTest {
 			.usePoints(PointHistoryRequestDto.usePoint(customerId,
 				WashingCourse.WASHING_A_COURSE.getFee()));
 
-		verify(machineRepository, times(1)).findMachineByMachineId(1, MachineType.WASHING);
+		verify(machineRepository, times(1)).findUsableMachineWithLock(1, MachineType.WASHING);
 		assertEquals(customerId, washingMachine.getCustomerId());
 		assertEquals(UsageStatus.USING, washingMachine.getUsageStatus());
 		assertEquals(LocalDateTime.now()
@@ -110,7 +110,7 @@ class UsingMachineServiceTest {
 			.machineId(1)
 			.course(DryingCourse.DRYING_A_COURSE)
 			.build();
-		when(machineRepository.findMachineByMachineId(1, MachineType.DRYING))
+		when(machineRepository.findUsableMachineWithLock(1, MachineType.DRYING))
 			.thenReturn(Optional.ofNullable(dryingMachine));
 
 		//when
@@ -121,7 +121,7 @@ class UsingMachineServiceTest {
 			.usePoints(PointHistoryRequestDto.usePoint(customerId,
 				DryingCourse.DRYING_A_COURSE.getFee()));
 
-		verify(machineRepository, times(1)).findMachineByMachineId(1, MachineType.DRYING);
+		verify(machineRepository, times(1)).findUsableMachineWithLock(1, MachineType.DRYING);
 		assertEquals(customerId, dryingMachine.getCustomerId());
 		assertEquals(UsageStatus.USING, dryingMachine.getUsageStatus());
 		assertEquals(LocalDateTime.now()
@@ -165,7 +165,7 @@ class UsingMachineServiceTest {
 			.usageStatus(UsageStatus.USING)
 			.build();
 
-		when(machineRepository.findMachineByMachineId(1, MachineType.WASHING))
+		when(machineRepository.findUsableMachineWithLock(1, MachineType.WASHING))
 			.thenReturn(Optional.ofNullable(washingMachine));
 
 		//then
@@ -193,7 +193,7 @@ class UsingMachineServiceTest {
 			.customerId(2L)
 			.build();
 
-		when(machineRepository.findMachineByMachineId(1, MachineType.WASHING))
+		when(machineRepository.findUsableMachineWithLock(1, MachineType.WASHING))
 			.thenReturn(Optional.ofNullable(washingMachine));
 
 		//then

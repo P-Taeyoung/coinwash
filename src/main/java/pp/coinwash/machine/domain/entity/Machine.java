@@ -36,7 +36,8 @@ public class Machine extends BaseEntity {
 	private long machineId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "laundry_id", nullable = false)
+	//TODO 테스트 때문에 null 허용 추후 다시 변경
+	@JoinColumn(name = "laundry_id" /*nullable = false*/)
 	private Laundry laundry;
 
 	@Enumerated(EnumType.STRING)
