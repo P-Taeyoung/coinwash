@@ -37,9 +37,8 @@ public class MachineManageController {
 
 	@GetMapping
 	public ResponseEntity<List<MachineResponseDto>> getMachines(
-		@RequestParam long laundryId,
-		@RequestParam long ownerId) {
-		return ResponseEntity.ok(machineManageService.getMachinesByLaundryId(laundryId, ownerId));
+		@RequestParam long laundryId) {
+		return ResponseEntity.ok(machineManageService.getMachinesByLaundryId(laundryId));
 	}
 
 	@PatchMapping

@@ -105,19 +105,16 @@ class MachineManageServiceTest {
 		assertEquals(MachineType.DRYING, machines.get(1).getMachineType());
 	}
 
-	@DisplayName("특정 점주 매장의 기계 정보 조회")
+	@DisplayName("특정 매장의 기계 정보 조회")
 	@Test
 	void getMachinesByLaundryId() {
 		//given
-		long ownerId = 1L;
 		long laundryId = 1L;
-		when(laundryRepository.existsByLaundryIdAndOwnerIdAndDeletedAtIsNull(laundryId, ownerId))
-			.thenReturn(true);
 		when(machineRepository.findByLaundryLaundryIdAndDeletedAtIsNull(laundryId))
 			.thenReturn(List.of(machine1, machine2));
 
 		//when
-		List<MachineResponseDto> machines = machineManageService.getMachinesByLaundryId(laundryId, ownerId);
+		List<MachineResponseDto> machines = machineManageService.getMachinesByLaundryId(laundryId);
 
 		//then
         verify(machineRepository, times(1)).findByLaundryLaundryIdAndDeletedAtIsNull(laundryId);

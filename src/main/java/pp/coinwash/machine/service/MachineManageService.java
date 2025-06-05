@@ -31,8 +31,7 @@ public class MachineManageService {
 		}
 	}
 
-	public List<MachineResponseDto> getMachinesByLaundryId(long laundryId, long ownerId) {
-		verifyValidateLaundry(laundryId, ownerId);
+	public List<MachineResponseDto> getMachinesByLaundryId(long laundryId) {
 
 		List<Machine> machines = machineRepository.findByLaundryLaundryIdAndDeletedAtIsNull(laundryId);
 
@@ -53,12 +52,6 @@ public class MachineManageService {
 	private Laundry getValidateLaundry(long laundryId, long ownerId) {
 		return laundryRepository.findByLaundryIdAndOwnerIdAndDeletedAtIsNull(laundryId, ownerId)
 			.orElseThrow(() -> new RuntimeException("해당하는 세탁소 정보를 찾을 수 없습니다."));
-	}
-
-	private void verifyValidateLaundry(long laundryId, long ownerId) {
-		if (!laundryRepository.existsByLaundryIdAndOwnerIdAndDeletedAtIsNull(laundryId, ownerId)) {
-			throw new RuntimeException("세탁소Id, 점장Id 와일치하는 세탁소 정보를 찾을 수 없습니다.");
-		}
 	}
 
 	private Machine getValidateMachine(long machineId, long ownerId) {
