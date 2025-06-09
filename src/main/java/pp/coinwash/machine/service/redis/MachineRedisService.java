@@ -31,11 +31,11 @@ public class MachineRedisService {
 	@PostConstruct
 	public void initializeMachineData() {
 		List<Machine> machines = machineRepository.findAll();
-		
+
 		for (Machine machine : machines) {
 			saveMachineToRedis(machine);
 		}
-		
+
 		log.info("저장된 기계 수 : {}", machines.size());
 	}
 
@@ -54,13 +54,11 @@ public class MachineRedisService {
 	public void updateMachine(Machine machine) {
 		String machineKey = MACHINE_KEY_PREFIX + machine.getMachineId();
 
-		MachineRedisDto dto = getMachineRedisDto(machine.getMachineId());
+		MachineRedisDto machineRedis = getMachineRedisDto(machine);
 
-		if (dto != null) {
-			dto.updateMachine(machine);
+		machineRedis.updateMachine(machine);
 
-			redisTemplate.opsForValue().set(machineKey, dto);
-		}
+		redisTemplate.opsForValue().set(machineKey, machineRedis);
 	}
 
 	public void deleteMachine(long machineId) {
@@ -82,7 +80,7 @@ public class MachineRedisService {
 
 		for (Object machineId : machineIds) {
 			String machineKey = MACHINE_KEY_PREFIX + machineId;
-			MachineRedisDto machine = (MachineRedisDto) redisTemplate.opsForValue().get(machineKey);
+			MachineRedisDto machine = (MachineRedisDto)redisTemplate.opsForValue().get(machineKey);
 			if (machine != null) {
 				machines.add(machine);
 			}
@@ -91,45 +89,51 @@ public class MachineRedisService {
 		return machines;
 	}
 
-	public void useMachine(long customerId, long machineId, LocalDateTime courseTime) {
-		String machineKey = MACHINE_KEY_PREFIX + machineId;
+	public void useMachine(long customerId, Machine machine, LocalDateTime courseTime) {
+		String machineKey = MACHINE_KEY_PREFIX + machine.getMachineId();
 
-		MachineRedisDto machine = getMachineRedisDto(machineId);
+		MachineRedisDto machineRedis = getMachineRedisDto(machine);
 
-		if (machine != null) {
-			machine.useMachine(customerId, courseTime);
+		machineRedis.useMachine(customerId, courseTime);
 
-			redisTemplate.opsForValue().set(machineKey, machine);
-		}
+		redisTemplate.opsForValue().set(machineKey, machineRedis);
 	}
 
-	public void reserveMachine(long customerId, long machineId) {
-		String machineKey = MACHINE_KEY_PREFIX + machineId;
+	public void reserveMachine(long customerId, Machine machine) {
+		String machineKey = MACHINE_KEY_PREFIX + machine.getMachineId();
 
-		MachineRedisDto machine = getMachineRedisDto(machineId);
+		MachineRedisDto machineRedis = getMachineRedisDto(machine);
 
-		if (machine != null) {
-			machine.reserveMachine(customerId);
+		machineRedis.reserveMachine(customerId);
 
-			redisTemplate.opsForValue().set(machineKey, machine);
-		}
+		redisTemplate.opsForValue().set(machineKey, machineRedis);
 	}
 
-	public void resetMachine(long machineId) {
-		String machineKey = MACHINE_KEY_PREFIX + machineId;
+	public void resetMachine(Machine machine) {
+		String machineKey = MACHINE_KEY_PREFIX + machine.getMachineId();
 
-		MachineRedisDto machine = getMachineRedisDto(machineId);
+		MachineRedisDto machineRedis = getMachineRedisDto(machine);
 
-		if(machine != null) {
-			machine.reset();
+		machineRedis.reset();
 
-			redisTemplate.opsForValue().set(machineKey, machine);
-		}
+		redisTemplate.opsForValue().set(machineKey, machineRedis);
+
 	}
 
-	private MachineRedisDto getMachineRedisDto(long machineId) {
-		String machineKey = MACHINE_KEY_PREFIX + machineId;
+	private MachineRedisDto getMachineRedisDto(Machine machine) {
+		String machineKey = MACHINE_KEY_PREFIX + machine.getMachineId();
+		String laundryMachinesKey = LAUNDRY_MACHINES_KEY_PREFIX + machine.getLaundry().getLaundryId();
 
-		return (MachineRedisDto) redisTemplate.opsForValue().get(machineKey);
+		MachineRedisDto dto = (MachineRedisDto)redisTemplate.opsForValue().get(machineKey);
+
+		if (dto == null) {
+			log.warn("Redis에서 기계 데이터 누락 감지, 재생성: machineId={}", machine.getMachineId());
+
+			// 세탁소별 기계 목록에도 추가 (누락 방지)
+			redisTemplate.opsForSet().add(laundryMachinesKey, machine.getMachineId());
+			return MachineRedisDto.from(machine);
+		} else {
+			return dto;
+		}
 	}
 }
