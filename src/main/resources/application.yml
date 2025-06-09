@@ -16,9 +16,16 @@ spring:
   jwt:
     secret: "vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb"
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: zerobase
+
 kakao:
   api:
     key: ${KAKAO_API_KEY}
+
 
 #logging:
 #  level:
