@@ -10,6 +10,7 @@ import java.util.concurrent.ScheduledFuture;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import pp.coinwash.machine.domain.entity.Machine;
@@ -24,6 +25,9 @@ public class MachineSchedulerService {
 	private final MachineRedisService machineRedisService;
 	private final UsingMachineService usingMachineService;
 	private final TaskScheduler taskScheduler;
+
+	//테스트 시 get 메서드 활용을 위해 추가
+	@Getter
 	private final Map<Long, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
 	public void scheduleMachine(Machine machine, LocalDateTime endTime) {
@@ -45,8 +49,6 @@ public class MachineSchedulerService {
 
 		scheduledTasks.put(machine.getMachineId(), future);
 		log.info("기계 스케줄링 완료: machineId={}, endTime={}", machine.getMachineId(), endTime);
-
-		scheduledTasks.put(machine.getMachineId(), future);
 	}
 
 	public void cancelScheduledTask(Long machineId) {
