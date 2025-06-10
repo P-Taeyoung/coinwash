@@ -33,7 +33,7 @@ public class Machine extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long machineId;
+	private Long machineId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	//TODO 테스트 때문에 null 허용 추후 다시 변경

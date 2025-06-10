@@ -53,14 +53,14 @@ class MachineManageServiceTest {
 			.build();
 
 		machine1 = Machine.builder()
-			.machineId(1)
+			.machineId(1L)
 			.laundry(laundry)
 			.machineType(MachineType.DRYING)
 			.usageStatus(UsageStatus.USABLE)
 			.build();
 
 		machine2 = Machine.builder()
-			.machineId(1)
+			.machineId(1L)
 			.laundry(laundry)
 			.machineType(MachineType.WASHING)
 			.usageStatus(UsageStatus.UNUSABLE)

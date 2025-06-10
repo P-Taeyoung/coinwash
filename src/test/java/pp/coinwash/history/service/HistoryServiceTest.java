@@ -53,7 +53,7 @@ class HistoryServiceTest {
 			.build();
 
 		machine = Machine.builder()
-			.machineId(2)
+			.machineId(2L)
 			.laundry(laundry)
 			.build();
 

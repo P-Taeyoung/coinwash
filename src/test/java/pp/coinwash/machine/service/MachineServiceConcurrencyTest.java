@@ -61,7 +61,7 @@ public class MachineServiceConcurrencyTest {
 			.build();
 
 		washingDto = UsingWashingDto.builder()
-			.machineId(1)
+			.machineId(1L)
 			.course(WashingCourse.WASHING_A_COURSE)
 			.build();
 
