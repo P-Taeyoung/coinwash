@@ -48,7 +48,7 @@ public class MachineRedisService {
 
 		// 세탁소별 기계 목록에 추가
 		String laundryMachinesKey = LAUNDRY_MACHINES_KEY_PREFIX + machine.getLaundry().getLaundryId();
-		redisTemplate.opsForSet().add(laundryMachinesKey, machine.getMachineId());
+		redisTemplate.opsForSet().add(laundryMachinesKey, machine.getMachineId().toString());
 	}
 
 	public void updateMachine(Machine machine) {
@@ -130,7 +130,7 @@ public class MachineRedisService {
 			log.warn("Redis에서 기계 데이터 누락 감지, 재생성: machineId={}", machine.getMachineId());
 
 			// 세탁소별 기계 목록에도 추가 (누락 방지)
-			redisTemplate.opsForSet().add(laundryMachinesKey, machine.getMachineId());
+			redisTemplate.opsForSet().add(laundryMachinesKey, machine.getMachineId().toString());
 			return MachineRedisDto.from(machine);
 		} else {
 			return dto;

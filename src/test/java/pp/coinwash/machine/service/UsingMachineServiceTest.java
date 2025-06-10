@@ -52,7 +52,7 @@ class UsingMachineServiceTest {
 			.build();
 
 		washingMachine = Machine.builder()
-			.machineId(1)
+			.machineId(1L)
 			.laundry(laundry)
 			.machineType(MachineType.WASHING)
 			.usageStatus(UsageStatus.USABLE)
@@ -61,7 +61,7 @@ class UsingMachineServiceTest {
 			.build();
 
 		dryingMachine = Machine.builder()
-			.machineId(1)
+			.machineId(1L)
 			.laundry(laundry)
 			.machineType(MachineType.DRYING)
 			.usageStatus(UsageStatus.USABLE)
@@ -77,7 +77,7 @@ class UsingMachineServiceTest {
 		//given
 		long customerId = 1;
 		washingDto = UsingWashingDto.builder()
-			.machineId(1)
+			.machineId(1L)
 			.course(WashingCourse.WASHING_A_COURSE)
 			.build();
 		when(machineRepository.findUsableMachineWithLock(1, MachineType.WASHING))
@@ -154,12 +154,12 @@ class UsingMachineServiceTest {
 		//given
 		long customerId = 1;
 		washingDto = UsingWashingDto.builder()
-			.machineId(1)
+			.machineId(1L)
 			.course(WashingCourse.WASHING_A_COURSE)
 			.build();
 
 		washingMachine = Machine.builder()
-			.machineId(1)
+			.machineId(1L)
 			.laundry(laundry)
 			.machineType(MachineType.WASHING)
 			.usageStatus(UsageStatus.USING)
@@ -181,12 +181,12 @@ class UsingMachineServiceTest {
 		//given
 		long customerId = 1;
 		washingDto = UsingWashingDto.builder()
-			.machineId(1)
+			.machineId(1L)
 			.course(WashingCourse.WASHING_A_COURSE)
 			.build();
 
 		washingMachine = Machine.builder()
-			.machineId(1)
+			.machineId(1L)
 			.laundry(laundry)
 			.machineType(MachineType.WASHING)
 			.usageStatus(UsageStatus.RESERVING)

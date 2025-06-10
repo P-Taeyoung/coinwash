@@ -43,7 +43,7 @@ class ReservingMachineServiceTest {
 		long machineId = 1;
 		long customerId = 1;
 		machine = Machine.builder()
-			.machineId(1)
+			.machineId(1L)
 			.usageStatus(UsageStatus.USABLE)
 			.endTime(null)
 			.customerId(null)

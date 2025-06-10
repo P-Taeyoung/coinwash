@@ -5,7 +5,7 @@ import pp.coinwash.history.domain.type.WashingCourse;
 
 @Builder
 public record UsingWashingDto(
-	long machineId,
+	Long machineId,
 	WashingCourse course
 ) {
 }
