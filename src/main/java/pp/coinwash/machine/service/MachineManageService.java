@@ -1,5 +1,6 @@
 package pp.coinwash.machine.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,13 +23,16 @@ public class MachineManageService {
 	private final MachineRepository machineRepository;
 	private final LaundryRepository laundryRepository;
 
-	public void registerMachines(List<MachineRegisterDto> dtos, long laundryId,long ownerId) {
+	public List<Machine> registerMachines(List<MachineRegisterDto> dtos, long laundryId,long ownerId) {
+		List<Machine> machines = new ArrayList<>();
 
 		Laundry laundry = getValidateLaundry(laundryId, ownerId);
 
 		for (MachineRegisterDto dto : dtos) {
-			machineRepository.save(Machine.of(dto,laundry));
+			machines.add(machineRepository.save(Machine.of(dto,laundry)));
 		}
+
+		return machines;
 	}
 
 	public List<MachineResponseDto> getMachinesByLaundryId(long laundryId) {
@@ -39,8 +43,12 @@ public class MachineManageService {
 	}
 
 	@Transactional
-	public void updateMachine(MachineUpdateDto updateDto, long ownerId) {
-		getValidateMachine(updateDto.machineId(), ownerId).updateOf(updateDto);
+	public Machine updateMachine(MachineUpdateDto updateDto, long ownerId) {
+		Machine machine = getValidateMachine(updateDto.machineId(), ownerId);
+
+		machine.updateOf(updateDto);
+
+		return machine;
 	}
 
 	@Transactional

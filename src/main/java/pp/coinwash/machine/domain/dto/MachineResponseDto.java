@@ -24,4 +24,14 @@ public record MachineResponseDto(
 			.notes(machine.getNotes())
 			.build();
 	}
+
+	public static MachineResponseDto fromRedis(MachineRedisDto dto) {
+		return MachineResponseDto.builder()
+			.machineId(dto.getMachineId())
+			.machineType(dto.getMachineType())
+			.usageStatus(dto.getUsageStatus())
+			.endTime(dto.getEndTime())
+			.notes(dto.getNotes())
+			.build();
+	}
 }
