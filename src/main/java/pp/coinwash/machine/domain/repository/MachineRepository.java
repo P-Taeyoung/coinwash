@@ -14,6 +14,8 @@ import pp.coinwash.machine.domain.type.MachineType;
 
 public interface MachineRepository extends JpaRepository<Machine, Long> {
 	List<Machine> findByLaundryLaundryIdAndDeletedAtIsNull(long laundryId);
+
+	@Lock(LockModeType.PESSIMISTIC_READ)
 	Optional<Machine> findByMachineIdAndLaundryOwnerId(long machineId, long ownerId);
 
 	@Query("SELECT m FROM Machine m WHERE m.machineId = :machineId AND m.machineType = :machineTyp")
