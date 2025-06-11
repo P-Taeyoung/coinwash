@@ -19,19 +19,27 @@ public class ReservingMachineService {
 	private final PointHistoryApplication pointHistoryApplication;
 
 	@Transactional
-	public void reserveMachine(long machineId, long customerId) {
+	public Machine reserveMachine(long machineId, long customerId) {
 
 		//예약금
 		pointHistoryApplication.usePoints(
 			PointHistoryRequestDto.usePoint(customerId, 100));
 
-		getCanReserveMachine(machineId).reserve(customerId);
+		Machine machine = getCanReserveMachine(machineId);
+
+		machine.reserve(customerId);
+
+		return machine;
 	}
 
 	@Transactional
-	public void cancelReserveMachine(long machineId, long customerId) {
+	public Machine cancelReserveMachine(long machineId, long customerId) {
 
-		getCancelReserveMachine(machineId, customerId).reset();
+		Machine machine = getCancelReserveMachine(machineId, customerId);
+
+		machine.reset();
+
+		return machine;
 	}
 
 	private Machine getCanReserveMachine(long machineId) {
