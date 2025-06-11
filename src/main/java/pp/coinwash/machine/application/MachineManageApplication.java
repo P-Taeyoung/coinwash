@@ -79,8 +79,8 @@ public class MachineManageApplication {
 			redisService.updateMachine(machine);
 
 		} catch (RedisException e) {
-			log.error("세탁기 {} Redis 업데이트 실패로 전체 롤백", updateDto.machineId(), e);
-			throw new RuntimeException("세탁기 상태 업데이트에 실패했습니다", e);
+			log.error("기계 {} Redis 업데이트 실패로 전체 롤백", updateDto.machineId(), e);
+			throw new RuntimeException("기계 상태 업데이트에 실패했습니다", e);
 		}
 	}
 
@@ -92,8 +92,8 @@ public class MachineManageApplication {
 			redisService.deleteMachine(machineId);
 
 		} catch (RedisException e) {
-			log.error("세탁기 {} Redis 데이터 삭제 실패로 전체 롤백", machineId, e);
-			throw new RuntimeException("세탁기 상태 업데이트에 실패했습니다", e);
+			log.error("기계 {} Redis 데이터 삭제 실패로 전체 롤백", machineId, e);
+			throw new RuntimeException("기계 상태 업데이트에 실패했습니다", e);
 		}
 	}
 }

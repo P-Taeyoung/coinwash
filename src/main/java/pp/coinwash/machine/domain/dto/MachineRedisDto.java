@@ -43,7 +43,7 @@ public class MachineRedisDto {
 	public void useMachine(long customerId, LocalDateTime courseTime) {
 		this.customerId = customerId;
 		this.usageStatus = UsageStatus.USING;
-		this.endTime = LocalDateTime.now().plusMinutes(courseTime.getMinute());
+		this.endTime = courseTime;
 	}
 
 	public void reserveMachine(long customerId) {
