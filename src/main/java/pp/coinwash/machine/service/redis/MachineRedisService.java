@@ -89,22 +89,22 @@ public class MachineRedisService {
 		return machines;
 	}
 
-	public void useMachine(long customerId, Machine machine, LocalDateTime courseTime) {
+	public void useMachine(Machine machine) {
 		String machineKey = MACHINE_KEY_PREFIX + machine.getMachineId();
 
 		MachineRedisDto machineRedis = getMachineRedisDto(machine);
 
-		machineRedis.useMachine(customerId, courseTime);
+		machineRedis.useMachine(machine.getCustomerId(), machine.getEndTime());
 
 		redisTemplate.opsForValue().set(machineKey, machineRedis);
 	}
 
-	public void reserveMachine(long customerId, Machine machine) {
+	public void reserveMachine(Machine machine) {
 		String machineKey = MACHINE_KEY_PREFIX + machine.getMachineId();
 
 		MachineRedisDto machineRedis = getMachineRedisDto(machine);
 
-		machineRedis.reserveMachine(customerId);
+		machineRedis.reserveMachine(machine.getCustomerId());
 
 		redisTemplate.opsForValue().set(machineKey, machineRedis);
 	}
@@ -117,7 +117,6 @@ public class MachineRedisService {
 		machineRedis.reset();
 
 		redisTemplate.opsForValue().set(machineKey, machineRedis);
-
 	}
 
 	private MachineRedisDto getMachineRedisDto(Machine machine) {

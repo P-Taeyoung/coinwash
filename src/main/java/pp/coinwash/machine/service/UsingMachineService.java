@@ -24,7 +24,7 @@ public class UsingMachineService {
 	private final PointHistoryApplication pointHistoryApplication;
 
 	@Transactional
-	public void useWashing(long customerId, UsingWashingDto usingWashingDto) {
+	public Machine useWashing(long customerId, UsingWashingDto usingWashingDto) {
 
 		Machine machine = verifyUsableMachine(
 			usingWashingDto.machineId(), customerId, WASHING);
@@ -34,10 +34,12 @@ public class UsingMachineService {
 				usingWashingDto.course().getFee()));
 
 		machine.useWashing(customerId, usingWashingDto.course());
+
+		return machine;
 	}
 
 	@Transactional
-	public void useDrying(long customerId, UsingDryingDto usingDryingDto) {
+	public Machine useDrying(long customerId, UsingDryingDto usingDryingDto) {
 
 		Machine machine = verifyUsableMachine(
 			usingDryingDto.machineId(), customerId, DRYING);
@@ -47,6 +49,8 @@ public class UsingMachineService {
 				usingDryingDto.course().getFee()));
 
 		machine.useDrying(customerId, usingDryingDto.course());
+
+		return machine;
 	}
 
 	//상태초기화

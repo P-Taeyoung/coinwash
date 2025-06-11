@@ -2,6 +2,7 @@ package pp.coinwash.machine.service.redis;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static pp.coinwash.history.domain.type.WashingCourse.*;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -56,7 +57,9 @@ class MachineRedisServiceTest {
 
 		testMachine = Machine.builder()
 			.machineId(1L)
+			.customerId(1L)
 			.laundry(testLaundry)
+			.endTime(LocalDateTime.now().plusMinutes(WASHING_A_COURSE.getCourseTime()))
 			.machineType(MachineType.WASHING)
 			.usageStatus(UsageStatus.USABLE)
 			.build();
@@ -187,20 +190,19 @@ class MachineRedisServiceTest {
 	void useMachine() {
 		// given
 		machineRedisService.saveMachineToRedis(testMachine);
-		long customerId = 100L;
 		LocalDateTime courseTime = LocalDateTime.now().plusHours(1);
 
 		// when
-		machineRedisService.useMachine(customerId, testMachine, courseTime);
+		machineRedisService.useMachine(testMachine);
 
 		// then
 		String machineKey = "machine:" + testMachine.getMachineId();
 		MachineRedisDto usedMachine = (MachineRedisDto) redisTemplate.opsForValue().get(machineKey);
 
 		assertThat(usedMachine).isNotNull();
-		assertThat(usedMachine.getCustomerId()).isEqualTo(customerId);
+		assertThat(usedMachine.getCustomerId()).isEqualTo(testMachine.getCustomerId());
 		assertThat(usedMachine.getEndTime().truncatedTo(ChronoUnit.SECONDS))
-			.isEqualTo(LocalDateTime.now().plusMinutes(courseTime.getMinute()).truncatedTo(ChronoUnit.SECONDS));
+			.isEqualTo(testMachine.getEndTime().truncatedTo(ChronoUnit.SECONDS));
 	}
 
 	@Test
@@ -208,17 +210,16 @@ class MachineRedisServiceTest {
 	void reserveMachine() {
 		// given
 		machineRedisService.saveMachineToRedis(testMachine);
-		long customerId = 100L;
 
 		// when
-		machineRedisService.reserveMachine(customerId, testMachine);
+		machineRedisService.reserveMachine(testMachine);
 
 		// then
 		String machineKey = "machine:" + testMachine.getMachineId();
 		MachineRedisDto reservedMachine = (MachineRedisDto) redisTemplate.opsForValue().get(machineKey);
 
 		assertThat(reservedMachine).isNotNull();
-		assertThat(reservedMachine.getCustomerId()).isEqualTo(customerId);
+		assertThat(reservedMachine.getCustomerId()).isEqualTo(1);
 		assertThat(reservedMachine.getUsageStatus()).isEqualTo(UsageStatus.RESERVING);
 		assertThat(reservedMachine.getEndTime().truncatedTo(ChronoUnit.SECONDS))
 			.isEqualTo(LocalDateTime.now().plusMinutes(15).truncatedTo(ChronoUnit.SECONDS));
@@ -229,7 +230,7 @@ class MachineRedisServiceTest {
 	void resetMachine() {
 		// given
 		machineRedisService.saveMachineToRedis(testMachine);
-		machineRedisService.useMachine(100L, testMachine, LocalDateTime.now().plusHours(1));
+		machineRedisService.useMachine(testMachine);
 
 		// when
 		machineRedisService.resetMachine(testMachine);
