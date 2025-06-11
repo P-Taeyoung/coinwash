@@ -1,0 +1,158 @@
+package pp.coinwash.machine.application;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import io.lettuce.core.RedisException;
+import pp.coinwash.machine.domain.dto.MachineRedisDto;
+import pp.coinwash.machine.domain.dto.MachineRegisterDto;
+import pp.coinwash.machine.domain.dto.MachineResponseDto;
+import pp.coinwash.machine.domain.dto.MachineUpdateDto;
+import pp.coinwash.machine.domain.entity.Machine;
+import pp.coinwash.machine.domain.type.MachineType;
+import pp.coinwash.machine.domain.type.UsageStatus;
+import pp.coinwash.machine.service.MachineManageService;
+import pp.coinwash.machine.service.redis.MachineRedisService;
+
+@ExtendWith(SpringExtension.class)
+class MachineManageApplicationTest {
+
+	@Mock
+	MachineRedisService redisService;
+
+	@Mock
+	MachineManageService manageService;
+
+	@InjectMocks
+	MachineManageApplication application;
+
+	private MachineResponseDto responseDto;
+	private MachineRedisDto redisDto;
+	private MachineRegisterDto registerDto;
+	private Machine machine;
+	private MachineUpdateDto updateDto;
+
+
+	@BeforeEach
+	void setUp() {
+		responseDto = MachineResponseDto.builder()
+			.machineId(1L)
+			.machineType(MachineType.WASHING)
+			.usageStatus(UsageStatus.USABLE)
+			.build();
+
+		redisDto  = MachineRedisDto.builder()
+			.machineId(1L)
+			.laundryId(1L)
+			.usageStatus(UsageStatus.USABLE)
+			.build();
+
+		registerDto = MachineRegisterDto.builder()
+			.machineType(MachineType.WASHING)
+			.build();
+
+		machine = Machine.builder()
+			.machineId(1L)
+			.machineType(MachineType.WASHING)
+			.usageStatus(UsageStatus.USABLE)
+			.build();
+
+		updateDto = MachineUpdateDto.builder()
+			.machineId(1L)
+			.usageStatus(UsageStatus.UNUSABLE)
+			.build();
+	}
+
+	@Test
+	@DisplayName("레디스에 데이터가 있는 경우")
+	void testGetMachinesByLaundryId_RedisHasData() {
+		// Given
+		long laundryId = 1L;
+		List<MachineRedisDto> redisData = List.of(redisDto);
+		when(redisService.getMachinesByLaundryId(laundryId)).thenReturn(redisData);
+
+		// When
+		List<MachineResponseDto> result = application.getMachinesByLaundryId(laundryId);
+
+		// Then
+		assertEquals(1, result.size());
+		verify(manageService, never()).getMachinesByLaundryId(anyLong()); // DB 호출 안 됨
+	}
+
+	@Test
+	@DisplayName("레디스 에러가 발생한 경우")
+	void testGetMachinesByLaundryId_RedisThrowsException() {
+		// Given
+		long laundryId = 1L;
+		when(redisService.getMachinesByLaundryId(laundryId)).thenThrow(new RedisException("레디스 오류"));
+		List<MachineResponseDto> dbData = List.of(responseDto);
+		when(manageService.getMachinesByLaundryId(laundryId)).thenReturn(dbData);
+
+		// When
+		List<MachineResponseDto> result = application.getMachinesByLaundryId(laundryId);
+
+		// Then
+		assertEquals(1, result.size());
+		verify(manageService).getMachinesByLaundryId(laundryId); // DB 호출 확인
+	}
+
+	@Test
+	@DisplayName("DB와 레디스 둘 다 저장 메서드가 잘 호출되는지 확인")
+	void testRegisterMachines_Success() {
+		// Given
+		long laundryId = 1L;
+		long ownerId = 1L;
+		List<MachineRegisterDto> dtos = List.of(registerDto);
+		List<Machine> machines = List.of(machine);
+		when(manageService.registerMachines(dtos, laundryId, ownerId)).thenReturn(machines);
+
+		// When
+		application.registerMachines(dtos, laundryId, ownerId);
+
+		// Then
+		verify(manageService).registerMachines(dtos, laundryId, ownerId);
+		verify(redisService, times(1)).saveMachineToRedis(any(Machine.class)); // Redis 저장 확인
+	}
+
+	@Test
+	@DisplayName("기계 업데이트")
+	void testUpdateMachine_Success() {
+		// Given
+		long ownerId = 1L;
+		machine.updateOf(updateDto);
+		when(manageService.updateMachine(updateDto, ownerId)).thenReturn(machine);
+
+		// When
+		application.updateMachine(updateDto, ownerId);
+
+		// Then
+		verify(manageService).updateMachine(updateDto, ownerId);
+		verify(redisService).updateMachine(machine); // Redis 업데이트 확인
+	}
+
+	@Test
+	@DisplayName("기계 삭제")
+	void testDeleteMachine_Success() {
+		// Given
+		long machineId = 1L;
+		long ownerId = 1L;
+
+		// When
+		application.deleteMachine(machineId, ownerId);
+
+		// Then
+		verify(manageService).deleteMachine(machineId, ownerId);
+		verify(redisService).deleteMachine(machineId); // Redis 삭제 확인
+	}
+
+}
