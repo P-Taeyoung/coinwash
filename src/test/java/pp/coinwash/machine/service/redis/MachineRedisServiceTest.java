@@ -156,6 +156,7 @@ class MachineRedisServiceTest {
 			.laundry(testLaundry)
 			.machineType(MachineType.DRYING)
 			.usageStatus(UsageStatus.RESERVING)
+			.endTime(LocalDateTime.now().plusMinutes(WASHING_A_COURSE.getCourseTime()))
 			.build();
 
 		machineRedisService.saveMachineToRedis(testMachine);
@@ -174,6 +175,37 @@ class MachineRedisServiceTest {
 		assertThat(machines.get(0).getUsageStatus()).isEqualTo(UsageStatus.USABLE);
 		assertThat(machines.get(1).getUsageStatus()).isEqualTo(UsageStatus.RESERVING);
 	}
+
+	@Test
+	@DisplayName("종료 시간이 넘어간 기계가 있을 때 해당 기계를 초기화한 후 반환한다.")
+	void getMachinesByLaundryIdWithReset() {
+		// given
+		Machine machine2 = Machine.builder()
+			.machineId(2L)
+			.laundry(testLaundry)
+			.machineType(MachineType.DRYING)
+			.usageStatus(UsageStatus.RESERVING)
+			.endTime(LocalDateTime.now().minusMinutes(1))
+			.build();
+
+		machineRedisService.saveMachineToRedis(testMachine);
+		machineRedisService.saveMachineToRedis(machine2);
+
+		// when
+		List<MachineRedisDto> machines = machineRedisService.getMachinesByLaundryId(testLaundry.getLaundryId());
+
+		// then
+		assertThat(machines).hasSize(2);
+		assertThat(machines)
+			.extracting(MachineRedisDto::getMachineId)
+			.containsExactlyInAnyOrder(1L, 2L);
+		assertThat(machines.get(0).getMachineId()).isEqualTo(testMachine.getMachineId());
+		assertThat(machines.get(1).getMachineId()).isEqualTo(machine2.getMachineId());
+		assertThat(machines.get(0).getUsageStatus()).isEqualTo(UsageStatus.USABLE);
+		assertThat(machines.get(1).getUsageStatus()).isEqualTo(UsageStatus.USABLE);
+		assertThat(machines.get(1).getEndTime()).isNull();
+	}
+
 	//
 	@Test
 	@DisplayName("존재하지 않는 세탁소 ID로 조회 시 빈 리스트를 반환한다")

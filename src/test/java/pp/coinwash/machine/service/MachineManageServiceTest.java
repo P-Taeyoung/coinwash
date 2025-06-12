@@ -3,6 +3,7 @@ package pp.coinwash.machine.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,7 +61,7 @@ class MachineManageServiceTest {
 			.build();
 
 		machine2 = Machine.builder()
-			.machineId(1L)
+			.machineId(2L)
 			.laundry(laundry)
 			.machineType(MachineType.WASHING)
 			.usageStatus(UsageStatus.UNUSABLE)
@@ -81,7 +82,6 @@ class MachineManageServiceTest {
 			.notes("모터 고장")
 			.build();
 	}
-
 
 	@DisplayName("기계 정보 등록")
 	@Test
@@ -117,10 +117,41 @@ class MachineManageServiceTest {
 		List<MachineResponseDto> machines = machineManageService.getMachinesByLaundryId(laundryId);
 
 		//then
-        verify(machineRepository, times(1)).findByLaundryLaundryIdAndDeletedAtIsNull(laundryId);
+		verify(machineRepository, times(1)).findByLaundryLaundryIdAndDeletedAtIsNull(laundryId);
 		assertEquals(2, machines.size());
 		assertEquals(MachineResponseDto.from(machine1), machines.get(0));
 		assertEquals(MachineResponseDto.from(machine2), machines.get(1));
+	}
+
+	@DisplayName("이미 사용 종료된 기계가 있을 때 초기화 후 반환")
+	@Test
+	void getMachinesByLaundryIdWithReset() {
+		//given
+		long laundryId = 1L;
+
+		Machine machine3 = Machine.builder()
+			.machineId(3L)
+			.customerId(1L)
+			.endTime(LocalDateTime.now().minusMinutes(1))
+			.build();
+
+		when(machineRepository.findByLaundryLaundryIdAndDeletedAtIsNull(laundryId))
+			.thenReturn(List.of(machine1, machine2, machine3));
+
+		//when
+		List<MachineResponseDto> machines = machineManageService.getMachinesByLaundryId(laundryId);
+
+		//then
+		verify(machineRepository, times(1)).findByLaundryLaundryIdAndDeletedAtIsNull(laundryId);
+		assertEquals(3, machines.size());
+		assertEquals(1, machines.get(0).machineId());
+		assertEquals(2, machines.get(1).machineId());
+		assertEquals(3, machines.get(2).machineId());
+
+		assertEquals(UsageStatus.USABLE, machines.get(0).usageStatus());
+
+		assertNull(machines.get(2).endTime());
+
 	}
 
 	@DisplayName("기계 정보 수정")
