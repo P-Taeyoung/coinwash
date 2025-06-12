@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +35,12 @@ class ReservingMachineServiceTest {
 	private ReservingMachineService reservingMachineService;
 
 	private Machine machine;
-	private Machine cancelReserveMachine;
+	private LocalDateTime currentTime;
+
+	@BeforeEach
+	void setUp() {
+		currentTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+	}
 
 	@DisplayName("예약 성공")
 	@Test
@@ -49,7 +55,7 @@ class ReservingMachineServiceTest {
 			.customerId(null)
 			.build();
 
-		when(machineRepository.findUsableMachineByMachineId(machineId))
+		when(machineRepository.findUsableMachineByMachineId(machineId, currentTime))
 			.thenReturn(Optional.ofNullable(machine));
 
 		//when
@@ -60,7 +66,7 @@ class ReservingMachineServiceTest {
 			.usePoints(PointHistoryRequestDto.usePoint(customerId,
 				100));
 
-		verify(machineRepository, times(1)).findUsableMachineByMachineId(machineId);
+		verify(machineRepository, times(1)).findUsableMachineByMachineId(machineId, currentTime);
 		assertEquals(customerId, machine.getCustomerId());
 		assertEquals(LocalDateTime.now().plusMinutes(15).truncatedTo(ChronoUnit.SECONDS)
 			, machine.getEndTime().truncatedTo(ChronoUnit.SECONDS));
@@ -72,17 +78,20 @@ class ReservingMachineServiceTest {
 		//given
 		long machineId = 1;
 		long customerId = 1;
+
 		machine = Machine.builder()
 			.customerId(1L)
+			.endTime(currentTime.plusMinutes(15).truncatedTo(ChronoUnit.SECONDS))
 			.build();
-		when(machineRepository.findUsableMachineByMachineId(machineId))
+
+		when(machineRepository.findReserveMachine(machineId, customerId))
 			.thenReturn(Optional.ofNullable(machine));
 
 		//when
 		reservingMachineService.cancelReserveMachine(machineId, customerId);
 
 		//then
-		verify(machineRepository, times(1)).findUsableMachineByMachineId(machineId);
+		verify(machineRepository, times(1)).findReserveMachine(machineId, customerId);
 		assertNull(machine.getCustomerId());
 		assertNull(machine.getEndTime());
 		assertEquals(UsageStatus.USABLE, machine.getUsageStatus());
@@ -94,17 +103,19 @@ class ReservingMachineServiceTest {
 		//given
 		long machineId = 1;
 		long customerId = 1;
+
 		machine = Machine.builder()
 			.customerId(2L)
 			.build();
-		when(machineRepository.findUsableMachineByMachineId(machineId))
-			.thenReturn(Optional.ofNullable(machine));
+
+		when(machineRepository.findReserveMachine(machineId, customerId))
+			.thenReturn(Optional.empty());
 
 		//then
 		RuntimeException exception =
 			assertThrows(RuntimeException.class,
 				() -> reservingMachineService.cancelReserveMachine(machineId, customerId));
 
-		assertEquals("예약 취소 권한이 없습니다.", exception.getMessage());
+		assertEquals("예약한 기계 정보가 없습니다.", exception.getMessage());
 	}
 }
