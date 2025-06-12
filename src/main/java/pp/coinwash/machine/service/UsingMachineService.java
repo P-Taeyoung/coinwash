@@ -2,6 +2,8 @@ package pp.coinwash.machine.service;
 
 import static pp.coinwash.machine.domain.type.MachineType.*;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,28 +63,32 @@ public class UsingMachineService {
 			.reset();
 	}
 
-
-
 	private Machine verifyUsableMachine(long machineId, long customerId, MachineType machineType) {
 
 		Machine machine = machineRepository.findUsableMachineWithLock(machineId, machineType)
 			.orElseThrow(() -> new RuntimeException("해당하는 기계 정보가 없습니다."));
 
-		if (machine.getUsageStatus() == UsageStatus.USING
-			|| machine.getUsageStatus() == UsageStatus.UNUSABLE) {
+		if (machine.getUsageStatus() == UsageStatus.UNUSABLE) {
 			throw new RuntimeException("현재 사용할 수 없는 기계입니다.");
 		}
 
-		// 예약 중이라면 예약자 확인
-		if (machine.getUsageStatus() == UsageStatus.RESERVING) {
+		if (machine.getEndTime() != null && machine.getEndTime().isAfter(LocalDateTime.now())) {
 
-			if (machine.getCustomerId() != customerId) {
-				throw new RuntimeException("예약자가 아닙니다.");
+			if (machine.getUsageStatus() == UsageStatus.USING) {
+				throw new RuntimeException("이미 사용중인 기계입니다.");
 			}
-			//예약금 환급
-			pointHistoryApplication.earnPoints(
-				PointHistoryRequestDto.earnPoint(customerId,
-					100));
+
+			// 예약 중이라면 예약자 확인
+			if (machine.getUsageStatus() == UsageStatus.RESERVING) {
+
+				if (machine.getCustomerId() != customerId) {
+					throw new RuntimeException("예약자가 아닙니다.");
+				}
+				//예약금 환급
+				pointHistoryApplication.earnPoints(
+					PointHistoryRequestDto.earnPoint(customerId,
+						100));
+			}
 		}
 
 		return machine;
