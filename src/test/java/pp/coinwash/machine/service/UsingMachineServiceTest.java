@@ -47,7 +47,7 @@ class UsingMachineServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		laundry  = Laundry.builder()
+		laundry = Laundry.builder()
 			.laundryId(1)
 			.build();
 
@@ -97,7 +97,7 @@ class UsingMachineServiceTest {
 		assertEquals(LocalDateTime.now()
 				.plusMinutes(WashingCourse.WASHING_A_COURSE.getCourseTime())
 				.truncatedTo(ChronoUnit.SECONDS)
-		, washingMachine.getEndTime().truncatedTo(ChronoUnit.SECONDS));
+			, washingMachine.getEndTime().truncatedTo(ChronoUnit.SECONDS));
 
 	}
 
@@ -163,6 +163,7 @@ class UsingMachineServiceTest {
 			.laundry(laundry)
 			.machineType(MachineType.WASHING)
 			.usageStatus(UsageStatus.USING)
+			.endTime(LocalDateTime.now().plusMinutes(WashingCourse.WASHING_A_COURSE.getCourseTime()))
 			.build();
 
 		when(machineRepository.findUsableMachineWithLock(1, MachineType.WASHING))
@@ -172,7 +173,7 @@ class UsingMachineServiceTest {
 		RuntimeException exception = assertThrows(RuntimeException.class,
 			() -> usingMachineService.useWashing(customerId, washingDto));
 
-		assertEquals("현재 사용할 수 없는 기계입니다.", exception.getMessage());
+		assertEquals("이미 사용중인 기계입니다.", exception.getMessage());
 	}
 
 	@DisplayName("이미 예약되어 있는 기계")
@@ -191,6 +192,7 @@ class UsingMachineServiceTest {
 			.machineType(MachineType.WASHING)
 			.usageStatus(UsageStatus.RESERVING)
 			.customerId(2L)
+			.endTime(LocalDateTime.now().plusMinutes(15))
 			.build();
 
 		when(machineRepository.findUsableMachineWithLock(1, MachineType.WASHING))
@@ -202,4 +204,34 @@ class UsingMachineServiceTest {
 
 		assertEquals("예약자가 아닙니다.", exception.getMessage());
 	}
+
+	@DisplayName("종료 시간이 넘어간 기계는 사용 가능")
+	@Test
+	void usingMachineWithReset() {
+		//Given
+		long customerId = 1;
+		washingDto = UsingWashingDto.builder()
+			.machineId(1L)
+			.course(WashingCourse.WASHING_A_COURSE)
+			.build();
+
+		Machine machine = Machine.builder()
+			.machineId(1L)
+			.usageStatus(UsageStatus.RESERVING)
+			.endTime(LocalDateTime.now().minusMinutes(1))
+			.customerId(2L)
+			.build();
+
+		when(machineRepository.findUsableMachineWithLock(1, MachineType.WASHING))
+			.thenReturn(Optional.ofNullable(machine));
+
+		//When
+		usingMachineService.useWashing(customerId, washingDto);
+
+		//Then
+		verify(machineRepository, times(1)).findUsableMachineWithLock(1, MachineType.WASHING);
+		assertEquals(customerId, machine.getCustomerId());
+		assertEquals(UsageStatus.USING, machine.getUsageStatus());
+	}
+
 }
