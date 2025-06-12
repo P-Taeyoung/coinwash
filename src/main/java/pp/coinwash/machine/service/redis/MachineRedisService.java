@@ -82,6 +82,12 @@ public class MachineRedisService {
 			String machineKey = MACHINE_KEY_PREFIX + machineId;
 			MachineRedisDto machine = (MachineRedisDto)redisTemplate.opsForValue().get(machineKey);
 			if (machine != null) {
+
+				if (machine.getEndTime() != null
+					&& machine.getEndTime().isBefore(LocalDateTime.now())) {
+
+					machine.reset();
+				}
 				machines.add(machine);
 			}
 		}

@@ -39,7 +39,7 @@ public class MachineController {
 		return ResponseEntity.ok("건조를 시작합니다.");
 	}
 
-	@PutMapping("/reservation")
+	@PutMapping("/reservations")
 	public ResponseEntity<String> reserveMachine(@RequestParam long machineId,
 		@RequestParam long customerId) {
 
@@ -48,7 +48,7 @@ public class MachineController {
 		return ResponseEntity.ok("예약되었습니다.");
 	}
 
-	@PatchMapping("/reservation")
+	@PatchMapping("/reservations")
 	public ResponseEntity<String> cancelReserveMachine(@RequestParam long machineId,
 		@RequestParam long customerId) {
 

@@ -1,5 +1,6 @@
 package pp.coinwash.machine.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +39,14 @@ public class MachineManageService {
 	public List<MachineResponseDto> getMachinesByLaundryId(long laundryId) {
 
 		List<Machine> machines = machineRepository.findByLaundryLaundryIdAndDeletedAtIsNull(laundryId);
+
+		for (Machine machine : machines) {
+			if (machine.getEndTime() != null
+			&& machine.getEndTime().isBefore(LocalDateTime.now())) {
+
+				machine.reset();
+			}
+		}
 
 		return machines.stream().map(MachineResponseDto::from).collect(Collectors.toList());
 	}
