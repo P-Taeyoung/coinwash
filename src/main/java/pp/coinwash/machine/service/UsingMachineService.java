@@ -3,11 +3,16 @@ package pp.coinwash.machine.service;
 import static pp.coinwash.machine.domain.type.MachineType.*;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import pp.coinwash.history.domain.dto.HistoryRequestDto;
+import pp.coinwash.history.event.HistoryEvent;
 import pp.coinwash.machine.domain.dto.UsingDryingDto;
 import pp.coinwash.machine.domain.dto.UsingWashingDto;
 import pp.coinwash.machine.domain.entity.Machine;
@@ -19,11 +24,14 @@ import pp.coinwash.point.domain.dto.PointHistoryRequestDto;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UsingMachineService {
 
 	private final MachineRepository machineRepository;
 
 	private final PointHistoryApplication pointHistoryApplication;
+
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public Machine useWashing(long customerId, UsingWashingDto usingWashingDto) {
@@ -36,6 +44,13 @@ public class UsingMachineService {
 				usingWashingDto.course().getFee()));
 
 		machine.useWashing(customerId, usingWashingDto.course());
+
+		publishEventSafely(
+			HistoryRequestDto.createWashingHistory(
+				customerId,
+				LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+				usingWashingDto.course()),
+			machine);
 
 		return machine;
 	}
@@ -51,6 +66,13 @@ public class UsingMachineService {
 				usingDryingDto.course().getFee()));
 
 		machine.useDrying(customerId, usingDryingDto.course());
+
+		publishEventSafely(
+			HistoryRequestDto.createDryingHistory(
+				customerId,
+				LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+				usingDryingDto.course()),
+			machine);
 
 		return machine;
 	}
@@ -92,5 +114,14 @@ public class UsingMachineService {
 		}
 
 		return machine;
+	}
+
+	private void publishEventSafely(HistoryRequestDto dto, Machine machine) {
+		try {
+			eventPublisher.publishEvent(HistoryEvent.of(dto, machine));
+		} catch (Exception e) {
+			//이벤트 발행 실패해도 메인 로직에 영향 없도록
+			log.warn("이벤트 발행 실패하지만 메인 기능은 정상 처리됨: {}", e.getMessage());
+		}
 	}
 }

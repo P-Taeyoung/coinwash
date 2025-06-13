@@ -13,7 +13,8 @@ public record HistoryResponseDto(
 	HistoryType historyType,
 	String laundryAddress,
 	LocalDateTime startTime,
-	LocalDateTime endTime
+	LocalDateTime endTime,
+	LocalDateTime createdAt
 ) {
 
 	public static HistoryResponseDto from(History history) {
@@ -25,6 +26,7 @@ public record HistoryResponseDto(
 			.historyType(history.getHistoryType())
 			.startTime(history.getStartTime())
 			.endTime(history.getEndTime())
+			.createdAt(history.getCreatedAt())
 			.build();
 	}
 }

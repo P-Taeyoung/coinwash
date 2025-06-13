@@ -3,10 +3,14 @@ package pp.coinwash.machine.service;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import pp.coinwash.history.domain.dto.HistoryRequestDto;
+import pp.coinwash.history.event.HistoryEvent;
 import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.domain.repository.MachineRepository;
 import pp.coinwash.point.application.PointHistoryApplication;
@@ -14,11 +18,14 @@ import pp.coinwash.point.domain.dto.PointHistoryRequestDto;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReservingMachineService {
 
 	private final MachineRepository machineRepository;
 
 	private final PointHistoryApplication pointHistoryApplication;
+
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public Machine reserveMachine(long machineId, long customerId) {
@@ -31,6 +38,15 @@ public class ReservingMachineService {
 
 		machine.reserve(customerId);
 
+		eventPublisher.publishEvent(new HistoryEvent(
+			HistoryRequestDto.createReservationHistory(customerId, LocalDateTime.now()), machine));
+
+		publishEventSafely(
+			HistoryRequestDto.createReservationHistory(
+				customerId,
+				LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)),
+			machine);
+
 		return machine;
 	}
 
@@ -40,6 +56,10 @@ public class ReservingMachineService {
 		Machine machine = getCancelReserveMachine(machineId, customerId);
 
 		machine.reset();
+
+		publishEventSafely(
+			HistoryRequestDto.createCancelReservationHistory(customerId),
+			machine);
 
 		return machine;
 	}
@@ -54,5 +74,14 @@ public class ReservingMachineService {
 
 		return machineRepository.findReserveMachine(machineId, customerId)
 			.orElseThrow(() -> new RuntimeException("예약한 기계 정보가 없습니다."));
+	}
+
+	private void publishEventSafely(HistoryRequestDto dto, Machine machine) {
+		try {
+			eventPublisher.publishEvent(HistoryEvent.of(dto, machine));
+		} catch (Exception e) {
+			//이벤트 발행 실패해도 메인 로직에 영향 없도록
+			log.warn("이벤트 발행 실패하지만 메인 기능은 정상 처리됨: {}", e.getMessage());
+		}
 	}
 }
