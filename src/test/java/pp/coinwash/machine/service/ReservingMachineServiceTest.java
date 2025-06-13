@@ -14,8 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import pp.coinwash.history.domain.type.WashingCourse;
+import pp.coinwash.history.event.HistoryEvent;
 import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.domain.repository.MachineRepository;
 import pp.coinwash.machine.domain.type.UsageStatus;
@@ -30,6 +32,9 @@ class ReservingMachineServiceTest {
 
 	@Mock
 	private PointHistoryApplication pointHistoryApplication;
+
+	@Mock
+	private ApplicationEventPublisher eventPublisher;
 
 	@InjectMocks
 	private ReservingMachineService reservingMachineService;
@@ -66,6 +71,8 @@ class ReservingMachineServiceTest {
 			.usePoints(PointHistoryRequestDto.usePoint(customerId,
 				100));
 
+		verify(eventPublisher, times(1)).publishEvent(any(HistoryEvent.class));
+
 		verify(machineRepository, times(1)).findUsableMachineByMachineId(machineId, currentTime);
 		assertEquals(customerId, machine.getCustomerId());
 		assertEquals(LocalDateTime.now().plusMinutes(15).truncatedTo(ChronoUnit.SECONDS)
@@ -90,11 +97,15 @@ class ReservingMachineServiceTest {
 		//when
 		reservingMachineService.cancelReserveMachine(machineId, customerId);
 
+
+
 		//then
 		verify(machineRepository, times(1)).findReserveMachine(machineId, customerId);
 		assertNull(machine.getCustomerId());
 		assertNull(machine.getEndTime());
 		assertEquals(UsageStatus.USABLE, machine.getUsageStatus());
+
+		verify(eventPublisher, times(1)).publishEvent(any(HistoryEvent.class));
 	}
 
 	@DisplayName("예약 취소 권한 없음")

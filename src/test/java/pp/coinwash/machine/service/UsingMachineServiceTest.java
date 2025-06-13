@@ -1,5 +1,6 @@
 package pp.coinwash.machine.service;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -11,12 +12,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
+import pp.coinwash.history.domain.dto.HistoryRequestDto;
 import pp.coinwash.history.domain.type.DryingCourse;
 import pp.coinwash.history.domain.type.WashingCourse;
+import pp.coinwash.history.event.HistoryEvent;
 import pp.coinwash.laundry.domain.entity.Laundry;
 import pp.coinwash.machine.domain.dto.UsingDryingDto;
 import pp.coinwash.machine.domain.dto.UsingWashingDto;
@@ -35,6 +40,9 @@ class UsingMachineServiceTest {
 
 	@Mock
 	private PointHistoryApplication pointHistoryApplication;
+
+	@Mock
+	ApplicationEventPublisher eventPublisher;
 
 	@InjectMocks
 	private UsingMachineService usingMachineService;
@@ -233,5 +241,37 @@ class UsingMachineServiceTest {
 		assertEquals(customerId, machine.getCustomerId());
 		assertEquals(UsageStatus.USING, machine.getUsageStatus());
 	}
+
+	@DisplayName("세탁기 사용 시 historyEvent 발행")
+	@Test
+	void createHistoryEvent() {
+		//given
+		long customerId = 1;
+		washingDto = UsingWashingDto.builder()
+			.machineId(1L)
+			.course(WashingCourse.WASHING_A_COURSE)
+			.build();
+
+		when(machineRepository.findUsableMachineWithLock(1, MachineType.WASHING))
+			.thenReturn(Optional.ofNullable(washingMachine));
+
+		//when
+		usingMachineService.useWashing(customerId, washingDto);
+
+		//then
+		verify(eventPublisher, times(1))
+			.publishEvent(new HistoryEvent(HistoryRequestDto.createWashingHistory(
+				customerId, LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS), WashingCourse.WASHING_A_COURSE
+			), washingMachine));
+
+		ArgumentCaptor<HistoryEvent> eventCaptor = ArgumentCaptor.forClass(HistoryEvent.class);
+		verify(eventPublisher).publishEvent(eventCaptor.capture());
+
+		HistoryEvent capturedEvent = eventCaptor.getValue();
+
+		assertThat(capturedEvent.machine()).isEqualTo(washingMachine);
+	}
+
+
 
 }
