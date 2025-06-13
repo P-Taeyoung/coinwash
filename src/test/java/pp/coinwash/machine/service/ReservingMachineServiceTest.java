@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
-import pp.coinwash.history.domain.type.WashingCourse;
 import pp.coinwash.history.event.HistoryEvent;
 import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.domain.repository.MachineRepository;
