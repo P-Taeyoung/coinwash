@@ -3,10 +3,13 @@ package pp.coinwash.machine.service;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import pp.coinwash.history.domain.dto.HistoryRequestDto;
+import pp.coinwash.history.event.HistoryEvent;
 import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.domain.repository.MachineRepository;
 import pp.coinwash.point.application.PointHistoryApplication;
@@ -20,6 +23,8 @@ public class ReservingMachineService {
 
 	private final PointHistoryApplication pointHistoryApplication;
 
+	private final ApplicationEventPublisher eventPublisher;
+
 	@Transactional
 	public Machine reserveMachine(long machineId, long customerId) {
 
@@ -31,6 +36,9 @@ public class ReservingMachineService {
 
 		machine.reserve(customerId);
 
+		eventPublisher.publishEvent(new HistoryEvent(
+			HistoryRequestDto.createReservationHistory(customerId, LocalDateTime.now()), machine));
+
 		return machine;
 	}
 
@@ -40,6 +48,9 @@ public class ReservingMachineService {
 		Machine machine = getCancelReserveMachine(machineId, customerId);
 
 		machine.reset();
+
+		eventPublisher.publishEvent(new HistoryEvent(
+			HistoryRequestDto.createCancelReservationHistory(customerId), machine));
 
 		return machine;
 	}

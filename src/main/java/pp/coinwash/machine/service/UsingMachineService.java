@@ -3,11 +3,15 @@ package pp.coinwash.machine.service;
 import static pp.coinwash.machine.domain.type.MachineType.*;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import pp.coinwash.history.domain.dto.HistoryRequestDto;
+import pp.coinwash.history.event.HistoryEvent;
 import pp.coinwash.machine.domain.dto.UsingDryingDto;
 import pp.coinwash.machine.domain.dto.UsingWashingDto;
 import pp.coinwash.machine.domain.entity.Machine;
@@ -25,6 +29,8 @@ public class UsingMachineService {
 
 	private final PointHistoryApplication pointHistoryApplication;
 
+	private final ApplicationEventPublisher eventPublisher;
+
 	@Transactional
 	public Machine useWashing(long customerId, UsingWashingDto usingWashingDto) {
 
@@ -36,6 +42,10 @@ public class UsingMachineService {
 				usingWashingDto.course().getFee()));
 
 		machine.useWashing(customerId, usingWashingDto.course());
+
+		eventPublisher.publishEvent(new HistoryEvent(
+			HistoryRequestDto.createWashingHistory(customerId, LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS), usingWashingDto.course()),
+			machine));
 
 		return machine;
 	}
@@ -51,6 +61,10 @@ public class UsingMachineService {
 				usingDryingDto.course().getFee()));
 
 		machine.useDrying(customerId, usingDryingDto.course());
+
+		eventPublisher.publishEvent(new HistoryEvent(
+			HistoryRequestDto.createDryingHistory(customerId, LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS), usingDryingDto.course()),
+			machine));
 
 		return machine;
 	}
