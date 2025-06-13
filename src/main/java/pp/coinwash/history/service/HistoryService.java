@@ -1,10 +1,14 @@
 package pp.coinwash.history.service;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import lombok.RequiredArgsConstructor;
 import pp.coinwash.common.dto.PagedResponseDto;
+import pp.coinwash.history.event.HistoryEvent;
 import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.history.domain.dto.HistoryRequestDto;
 import pp.coinwash.history.domain.dto.HistoryResponseDto;
@@ -17,13 +21,19 @@ public class HistoryService {
 
 	private final HistoryRepository historyRepository;
 
+	@Async("historyTaskExecutor")
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	public void handleHistoryEvent(HistoryEvent event) {
+
+		createUsageHistory(event.requestDto(), event.machine());
+	}
+
 	public void createUsageHistory(HistoryRequestDto requestDto
 		, Machine machine) {
 
 		historyRepository.save(History.of(requestDto, machine));
 	}
 
-	//TODO 추후 QueryDSL 을 이용하여 조회할 수 있도록 함.
 	public PagedResponseDto<HistoryResponseDto> getUsageHistoriesByCustomerId(
 		long customerId, Pageable pageable) {
 
@@ -31,6 +41,4 @@ public class HistoryService {
 			.findAllByCustomerId(customerId, pageable)
 			.map(HistoryResponseDto::from));
 	}
-
-
 }
