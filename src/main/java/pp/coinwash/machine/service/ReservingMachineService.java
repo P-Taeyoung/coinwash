@@ -1,5 +1,7 @@
 package pp.coinwash.machine.service;
 
+import static pp.coinwash.machine.event.MachineEvent.*;
+
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -13,6 +15,7 @@ import pp.coinwash.history.domain.dto.HistoryRequestDto;
 import pp.coinwash.history.event.HistoryEvent;
 import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.domain.repository.MachineRepository;
+import pp.coinwash.machine.event.MachineEvent;
 import pp.coinwash.point.application.PointHistoryApplication;
 import pp.coinwash.point.domain.dto.PointHistoryRequestDto;
 
@@ -38,14 +41,13 @@ public class ReservingMachineService {
 
 		machine.reserve(customerId);
 
-		eventPublisher.publishEvent(new HistoryEvent(
-			HistoryRequestDto.createReservationHistory(customerId, LocalDateTime.now()), machine));
-
-		publishEventSafely(
+		publishHistoryEventSafely(
 			HistoryRequestDto.createReservationHistory(
 				customerId,
 				LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)),
 			machine);
+
+		publishSchedulerEventSafely(machine, ScheduleType.RESERVING);
 
 		return machine;
 	}
@@ -57,9 +59,11 @@ public class ReservingMachineService {
 
 		machine.reset();
 
-		publishEventSafely(
+		publishHistoryEventSafely(
 			HistoryRequestDto.createCancelReservationHistory(customerId),
 			machine);
+
+		publishSchedulerEventSafely(machine, ScheduleType.CANCEL_RESERVING);
 
 		return machine;
 	}
@@ -76,9 +80,24 @@ public class ReservingMachineService {
 			.orElseThrow(() -> new RuntimeException("예약한 기계 정보가 없습니다."));
 	}
 
-	private void publishEventSafely(HistoryRequestDto dto, Machine machine) {
+	private void publishHistoryEventSafely(HistoryRequestDto dto, Machine machine) {
 		try {
 			eventPublisher.publishEvent(HistoryEvent.of(dto, machine));
+		} catch (Exception e) {
+			//이벤트 발행 실패해도 메인 로직에 영향 없도록
+			log.warn("이벤트 발행 실패하지만 메인 기능은 정상 처리됨: {}", e.getMessage());
+		}
+	}
+
+	private void publishSchedulerEventSafely(Machine machine, ScheduleType scheduleType) {
+		try {
+
+			if (scheduleType == ScheduleType.RESERVING) {
+				eventPublisher.publishEvent(reservingMachineEvent(machine));
+			} else {
+				eventPublisher.publishEvent(cancelReservingMachineEvent(machine));
+			}
+
 		} catch (Exception e) {
 			//이벤트 발행 실패해도 메인 로직에 영향 없도록
 			log.warn("이벤트 발행 실패하지만 메인 기능은 정상 처리됨: {}", e.getMessage());
