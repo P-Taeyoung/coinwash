@@ -33,6 +33,7 @@ import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.domain.repository.MachineRepository;
 import pp.coinwash.machine.domain.type.MachineType;
 import pp.coinwash.machine.domain.type.UsageStatus;
+import pp.coinwash.machine.event.MachineEvent;
 import pp.coinwash.point.application.PointHistoryApplication;
 import pp.coinwash.point.domain.dto.PointHistoryRequestDto;
 
@@ -53,6 +54,7 @@ class UsingMachineServiceTest {
 
 	@Mock
 	private HistoryRepository historyRepository;
+
 
 	@InjectMocks
 	private UsingMachineService usingMachineService;
@@ -273,6 +275,34 @@ class UsingMachineServiceTest {
 			.publishEvent(new HistoryEvent(HistoryRequestDto.createWashingHistory(
 				customerId, LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS), WashingCourse.WASHING_A_COURSE
 			), washingMachine));
+
+		ArgumentCaptor<HistoryEvent> eventCaptor = ArgumentCaptor.forClass(HistoryEvent.class);
+		verify(eventPublisher).publishEvent(eventCaptor.capture());
+
+		HistoryEvent capturedEvent = eventCaptor.getValue();
+
+		assertThat(capturedEvent.machine()).isEqualTo(washingMachine);
+	}
+
+	@DisplayName("세탁기 사용 시 MachineEvent 발행")
+	@Test
+	void createMachineEvent() {
+		//given
+		long customerId = 1;
+		washingDto = UsingWashingDto.builder()
+			.machineId(1L)
+			.course(WashingCourse.WASHING_A_COURSE)
+			.build();
+
+		when(machineRepository.findUsableMachineWithLock(1, MachineType.WASHING))
+			.thenReturn(Optional.ofNullable(washingMachine));
+
+		//when
+		usingMachineService.useWashing(customerId, washingDto);
+
+		//then
+		verify(eventPublisher, times(1))
+			.publishEvent(MachineEvent.usingMachineEvent(washingMachine));
 
 		ArgumentCaptor<HistoryEvent> eventCaptor = ArgumentCaptor.forClass(HistoryEvent.class);
 		verify(eventPublisher).publishEvent(eventCaptor.capture());

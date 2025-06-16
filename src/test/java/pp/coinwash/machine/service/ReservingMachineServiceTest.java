@@ -1,5 +1,6 @@
 package pp.coinwash.machine.service;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -11,15 +12,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
+import pp.coinwash.history.domain.type.WashingCourse;
 import pp.coinwash.history.event.HistoryEvent;
+import pp.coinwash.machine.domain.dto.UsingWashingDto;
 import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.domain.repository.MachineRepository;
+import pp.coinwash.machine.domain.type.MachineType;
 import pp.coinwash.machine.domain.type.UsageStatus;
+import pp.coinwash.machine.event.MachineEvent;
 import pp.coinwash.point.application.PointHistoryApplication;
 import pp.coinwash.point.domain.dto.PointHistoryRequestDto;
 
@@ -72,6 +78,8 @@ class ReservingMachineServiceTest {
 
 		verify(eventPublisher, times(1)).publishEvent(any(HistoryEvent.class));
 
+		verify(eventPublisher, times(1)).publishEvent(MachineEvent.reservingMachineEvent(machine));
+
 		verify(machineRepository, times(1)).findUsableMachineByMachineId(machineId, currentTime);
 		assertEquals(customerId, machine.getCustomerId());
 		assertEquals(LocalDateTime.now().plusMinutes(15).truncatedTo(ChronoUnit.SECONDS)
@@ -99,12 +107,15 @@ class ReservingMachineServiceTest {
 
 
 		//then
+
+		verify(eventPublisher, times(1)).publishEvent(any(HistoryEvent.class));
+
+		verify(eventPublisher, times(1)).publishEvent(MachineEvent.cancelReservingMachineEvent(machine));
+
 		verify(machineRepository, times(1)).findReserveMachine(machineId, customerId);
 		assertNull(machine.getCustomerId());
 		assertNull(machine.getEndTime());
 		assertEquals(UsageStatus.USABLE, machine.getUsageStatus());
-
-		verify(eventPublisher, times(1)).publishEvent(any(HistoryEvent.class));
 	}
 
 	@DisplayName("예약 취소 권한 없음")
@@ -128,4 +139,5 @@ class ReservingMachineServiceTest {
 
 		assertEquals("예약한 기계 정보가 없습니다.", exception.getMessage());
 	}
+
 }
