@@ -22,7 +22,7 @@ import pp.coinwash.laundry.service.LaundryManageService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/laundries")
+@RequestMapping("/api/owner/laundries")
 public class LaundryManageController {
 
 	private final LaundryManageService laundryManageService;
@@ -35,7 +35,7 @@ public class LaundryManageController {
 		return ResponseEntity.ok("매장 등록이 완료되었습니다.");
 	}
 
-	@GetMapping("/owner")
+	@GetMapping
 	public ResponseEntity<PagedResponseDto<LaundryResponseDto>> getLaundriesByOwnerId(
 		@RequestParam long ownerId,
 		@PageableDefault(sort = "laundryId", direction = Sort.Direction.DESC)
