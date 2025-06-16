@@ -50,7 +50,7 @@ class MachineSchedulerServiceTest {
 
 	@Test
 	@DisplayName("기계 스케줄링이 정상적으로 등록되는지 테스트")
-	void scheduleMachine_Success() {
+	void scheduleUsingMachine_Success() {
 		// Given
 		LocalDateTime endTime = LocalDateTime.now().plusHours(1);
 
@@ -60,7 +60,7 @@ class MachineSchedulerServiceTest {
 			.schedule(any(Runnable.class), any(Instant.class));
 
 		// When
-		machineSchedulerService.scheduleMachine(testMachine, endTime);
+		machineSchedulerService.scheduleUsingMachine(testMachine, endTime);
 
 		// Then
 		verify(taskScheduler, times(1)).schedule(any(Runnable.class), any(Instant.class));
@@ -68,7 +68,7 @@ class MachineSchedulerServiceTest {
 
 	@Test
 	@DisplayName("기존 스케줄이 있을 때 새로운 스케줄로 교체되는지 테스트")
-	void scheduleMachine_ReplaceExistingSchedule() {
+	void scheduleMachine_ReplaceExistingScheduleUsing() {
 		// Given
 		// 기존 스케줄된 작업이 아직 실행 중인 상황을 시뮬레이션
 		LocalDateTime endTime = LocalDateTime.now().plusHours(1);
@@ -84,7 +84,7 @@ class MachineSchedulerServiceTest {
 
 
 		// When
-		machineSchedulerService.scheduleMachine(testMachine, endTime);
+		machineSchedulerService.scheduleUsingMachine(testMachine, endTime);
 
 		// Then
 		verify(oldFuture).cancel(false); // 기존 스케줄이 취소되었는지 확인
@@ -93,7 +93,7 @@ class MachineSchedulerServiceTest {
 
 	@Test
 	@DisplayName("스케줄된 작업이 실행될 때 정상적으로 처리되는지 테스트")
-	void scheduleMachine_TaskExecution() {
+	void scheduleUsingMachine_TaskExecution() {
 		// Given
 		LocalDateTime endTime = LocalDateTime.now().plusHours(1);
 		ArgumentCaptor<Runnable> runnableCaptor = ArgumentCaptor.forClass(Runnable.class);
@@ -103,7 +103,7 @@ class MachineSchedulerServiceTest {
 			.schedule(any(Runnable.class), any(Instant.class));
 
 		// When
-		machineSchedulerService.scheduleMachine(testMachine, endTime);
+		machineSchedulerService.scheduleUsingMachine(testMachine, endTime);
 
 		// Then
 		verify(taskScheduler).schedule(runnableCaptor.capture(), any(Instant.class));
