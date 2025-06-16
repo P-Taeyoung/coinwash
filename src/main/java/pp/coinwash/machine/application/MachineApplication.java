@@ -15,7 +15,6 @@ import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.service.ReservingMachineService;
 import pp.coinwash.machine.service.UsingMachineService;
 import pp.coinwash.machine.service.redis.MachineRedisService;
-import pp.coinwash.machine.service.scheduler.MachineSchedulerService;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +22,6 @@ import pp.coinwash.machine.service.scheduler.MachineSchedulerService;
 public class MachineApplication {
 
 	private final MachineRedisService redisService;
-	private final MachineSchedulerService schedulerService;
 	private final UsingMachineService usingService;
 	private final ReservingMachineService reservingService;
 
