@@ -36,12 +36,12 @@ public class SseEmitterService {
 		return sseEmitter;
 	}
 
-	public void sendToCustomer(Long customerId, NotificationRequestDto dto) {
+	public void sendToCustomer(NotificationRequestDto dto) {
 
-		SseEmitter sseEmitter = emitterRepository.findById(customerId).orElse(null);
+		SseEmitter sseEmitter = emitterRepository.findById(dto.customerId()).orElse(null);
 
 		if (sseEmitter == null) {
-			log.info("알림 대상자 SSE 연결 비활성: 대상자 Id : {}", customerId);
+			log.info("알림 대상자 SSE 연결 비활성: 대상자 Id : {}", dto.customerId());
 			return;
 		}
 
@@ -52,7 +52,7 @@ public class SseEmitterService {
 					.data(dto)
 			);
 		} catch (IOException e) {
-			log.error("SSE 알림 전송 실패: 대상자 Id: {}, 원인: {}", customerId, e.getMessage());
+			log.error("SSE 알림 전송 실패: 대상자 Id: {}, 원인: {}", dto.customerId(), e.getMessage());
 			throw new RuntimeException("SSE 알림 전송 실패");
 		}
 
