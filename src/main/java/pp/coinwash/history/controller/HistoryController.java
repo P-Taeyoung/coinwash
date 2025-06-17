@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import pp.coinwash.common.dto.PagedResponseDto;
 import pp.coinwash.machine.domain.repository.MachineRepository;
@@ -20,12 +22,18 @@ import pp.coinwash.history.service.HistoryService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/usage-history")
+@RequestMapping("/api/history")
+@Tag(name = "기계 사용/예약 내역 ", description = "기계 사용/예약 내역 조회 API")
 public class HistoryController {
 
 	private final HistoryService historyService;
 	private final MachineRepository machineRepository;
 
+	@Operation(
+		summary = "기계 사용/예약 내역 조회",
+		tags = {"기계 사용/예약 내역"},
+		description = "사용자의 기계 사용/예약 내역 조회, Page 형태로 반환하여 페이지네이션할 수 있도록 함."
+	)
 	@GetMapping
 	public ResponseEntity<PagedResponseDto<HistoryResponseDto>> getUsageHistories(
 		@RequestParam long customerId,
