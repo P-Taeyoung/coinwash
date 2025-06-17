@@ -95,7 +95,7 @@ class LaundryManageServiceTest {
 		//given
 		long ownerId = 1;
 		when(laundryRepository.existsWithinDistance(
-			registerDto.latitude(), registerDto.longitude(), 500))
+			registerDto.longitude(), registerDto.latitude(), 500))
 			.thenReturn(false);
 
 		//when
@@ -103,7 +103,7 @@ class LaundryManageServiceTest {
 
 		//then
 		ArgumentCaptor<Laundry> laundryCaptor = ArgumentCaptor.forClass(Laundry.class);
-		verify(laundryRepository).existsWithinDistance(registerDto.latitude(), registerDto.longitude(), 500);
+		verify(laundryRepository).existsWithinDistance( registerDto.longitude(), registerDto.latitude(), 500);
 		verify(laundryRepository, times(1)).save(laundryCaptor.capture());
 
 		Laundry savedLaundry = laundryCaptor.getValue();

@@ -20,15 +20,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.service.UsingMachineService;
 import pp.coinwash.machine.service.redis.MachineRedisService;
+import pp.coinwash.notification.domain.dto.NotificationRequestDto;
+import pp.coinwash.notification.service.SseEmitterService;
 
 @ExtendWith(SpringExtension.class)
 class MachineSchedulerServiceTest {
 
 	@Mock
-	private MachineRedisService machineRedisService;
-
-	@Mock
-	private UsingMachineService usingMachineService;
+	private SseEmitterService sseEmitterService;
 
 	@Mock
 	private TaskScheduler taskScheduler;
@@ -113,8 +112,7 @@ class MachineSchedulerServiceTest {
 		capturedTask.run();
 
 		// 스케줄된 작업이 실행되었을 때의 동작 검증
-		verify(machineRedisService).resetMachine(testMachine);
-		verify(usingMachineService).resetStatus(testMachine.getMachineId());
+		verify(sseEmitterService).sendToCustomer(any(NotificationRequestDto.class));
 	}
 
 	@Test

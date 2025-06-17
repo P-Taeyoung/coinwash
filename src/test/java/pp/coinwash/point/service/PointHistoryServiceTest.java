@@ -24,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import pp.coinwash.common.dto.PagedResponseDto;
+import pp.coinwash.common.exception.CustomException;
 import pp.coinwash.history.domain.entity.History;
 import pp.coinwash.point.domain.dto.PointHistoryRequestDto;
 import pp.coinwash.point.domain.dto.PointHistoryResponseDto;
@@ -166,7 +167,7 @@ class PointHistoryServiceTest {
 
 		//when
 		//then
-		RuntimeException exception = assertThrows(RuntimeException.class,
+		RuntimeException exception = assertThrows(CustomException.class,
 			() -> pointHistoryService.usePoint(requestDto1));
 
 		assertEquals("포인트가 부족합니다.", exception.getMessage());

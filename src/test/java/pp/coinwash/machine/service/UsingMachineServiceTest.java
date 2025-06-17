@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
+import pp.coinwash.common.exception.CustomException;
 import pp.coinwash.history.domain.dto.HistoryRequestDto;
 import pp.coinwash.history.domain.repository.HistoryRepository;
 import pp.coinwash.history.domain.type.DryingCourse;
@@ -190,10 +191,11 @@ class UsingMachineServiceTest {
 			.thenReturn(Optional.ofNullable(washingMachine));
 
 		//then
-		RuntimeException exception = assertThrows(RuntimeException.class,
+		CustomException exception = assertThrows(CustomException.class,
 			() -> usingMachineService.useWashing(customerId, washingDto));
 
-		assertEquals("이미 사용중인 기계입니다.", exception.getMessage());
+		assertEquals("기계가 이미 사용 중입니다.", exception.getMessage());
+		assertEquals(409, exception.getErrorCode().getHttpStatus());
 	}
 
 	@DisplayName("이미 예약되어 있는 기계")

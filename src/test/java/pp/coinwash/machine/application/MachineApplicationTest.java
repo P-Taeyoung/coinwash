@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import io.lettuce.core.RedisException;
+import pp.coinwash.common.exception.CustomException;
+import pp.coinwash.common.exception.ErrorCode;
 import pp.coinwash.history.domain.type.DryingCourse;
 import pp.coinwash.history.domain.type.WashingCourse;
 import pp.coinwash.machine.domain.dto.UsingDryingDto;
@@ -89,11 +91,10 @@ class MachineApplicationTest {
 			.when(redisService).useMachine(mockMachine);
 
 		// when & then
-		RuntimeException exception = assertThrows(RuntimeException.class,
+		CustomException exception = assertThrows(CustomException.class,
 			() -> machineApplication.useWashing(customerId, usingWashingDto));
 
-		assertThat(exception.getMessage()).isEqualTo("세탁기 사용에 실패했습니다");
-		assertThat(exception.getCause()).isInstanceOf(RedisException.class);
+		assertThat(exception.getMessage()).isEqualTo(ErrorCode.FAILED_TO_CHANGE_MACHINE_STATUS.getMessage());
 
 		verify(usingService).useWashing(customerId, usingWashingDto);
 		verify(redisService).useMachine(mockMachine);
@@ -144,11 +145,10 @@ class MachineApplicationTest {
 			.when(redisService).useMachine(mockMachine);
 
 		// when & then
-		RuntimeException exception = assertThrows(RuntimeException.class,
+		CustomException exception = assertThrows(CustomException.class,
 			() -> machineApplication.useDrying(customerId, usingDryingDto));
 
-		assertThat(exception.getMessage()).isEqualTo("건조기 사용에 실패했습니다");
-		assertThat(exception.getCause()).isInstanceOf(RedisException.class);
+		assertThat(exception.getMessage()).isEqualTo(ErrorCode.FAILED_TO_CHANGE_MACHINE_STATUS.getMessage());
 	}
 
 	@Test
@@ -180,11 +180,10 @@ class MachineApplicationTest {
 			.when(redisService).reserveMachine(mockMachine);
 
 		// when & then
-		RuntimeException exception = assertThrows(RuntimeException.class,
+		CustomException exception = assertThrows(CustomException.class,
 			() -> machineApplication.reserveMachine(machineId, customerId));
 
-		assertThat(exception.getMessage()).isEqualTo("기계 예약에 실패했습니다");
-		assertThat(exception.getCause()).isInstanceOf(RedisException.class);
+		assertThat(exception.getMessage()).isEqualTo(ErrorCode.FAILED_TO_CHANGE_MACHINE_STATUS.getMessage());
 	}
 
 	@Test
@@ -216,11 +215,10 @@ class MachineApplicationTest {
 			.when(redisService).resetMachine(mockMachine);
 
 		// when & then
-		RuntimeException exception = assertThrows(RuntimeException.class,
+		CustomException exception = assertThrows(CustomException.class,
 			() -> machineApplication.cancelReservingMachine(machineId, customerId));
 
-		assertThat(exception.getMessage()).isEqualTo("기계 예약 취소에 실패했습니다");
-		assertThat(exception.getCause()).isInstanceOf(RedisException.class);
+		assertThat(exception.getMessage()).isEqualTo(ErrorCode.FAILED_TO_CHANGE_MACHINE_STATUS.getMessage());
 	}
 
 	@Test
