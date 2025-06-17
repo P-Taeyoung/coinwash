@@ -56,13 +56,4 @@ public class MachineController {
 
 		return ResponseEntity.ok("예약이 취소되었습니다.");
 	}
-
-	//TEST 용
-	// @PatchMapping
-	// public ResponseEntity<String> resetMachine(@RequestParam long machineId) {
-	//
-	// 	machineApplication.resetStatus(machineId);
-	//
-	// 	return ResponseEntity.ok("기계 초기화가 완료되었습니다.");
-	// }
 }

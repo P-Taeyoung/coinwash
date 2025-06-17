@@ -1,10 +1,14 @@
 package pp.coinwash.user.service;
 
+import static pp.coinwash.common.exception.ErrorCode.*;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import pp.coinwash.common.exception.CustomException;
+import pp.coinwash.common.exception.ErrorCode;
 import pp.coinwash.security.JwtProvider;
 import pp.coinwash.security.dto.UserAuthDto;
 import pp.coinwash.user.domain.dto.CustomerResponseDto;
@@ -48,10 +52,10 @@ public class CustomerService {
 
 	private Customer validateId(UserSignInDto dto) {
 		Customer customer =  customerRepository.findByLoginIdAndDeletedAtIsNull(dto.signInId())
-			.orElseThrow(() -> new RuntimeException("일치하는 아이디가 없습니다."));
+			.orElseThrow(() -> new CustomException(INVALID_CREDENTIALS));
 
 		if (!passwordEncoder.matches(dto.password(), customer.getPassword())) {
-			throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+			throw new CustomException(INVALID_CREDENTIALS);
 		}
 
 		return customer;
@@ -59,12 +63,12 @@ public class CustomerService {
 
 	private void existsId(String id) {
 		if (customerRepository.existsByLoginIdAndDeletedAtIsNull(id)) {
-			throw new RuntimeException("이미 존재하는 아이디입니다.");
+			throw new CustomException(ALREADY_EXISTS_ID);
 		}
 	}
 
 	private Customer validateCustomer(long customerId) {
 		return customerRepository.findByCustomerIdAndDeletedAtIsNull(customerId)
-			.orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+			.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 	}
 }

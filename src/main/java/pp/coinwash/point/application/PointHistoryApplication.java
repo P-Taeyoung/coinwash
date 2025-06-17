@@ -1,5 +1,7 @@
 package pp.coinwash.point.application;
 
+import static pp.coinwash.common.exception.ErrorCode.*;
+
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -7,6 +9,8 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import pp.coinwash.common.dto.PagedResponseDto;
+import pp.coinwash.common.exception.CustomException;
+import pp.coinwash.common.exception.ErrorCode;
 import pp.coinwash.point.domain.dto.PointHistoryRequestDto;
 import pp.coinwash.point.domain.dto.PointHistoryResponseDto;
 import pp.coinwash.point.service.PointHistoryService;
@@ -24,11 +28,11 @@ public class PointHistoryApplication {
 			pointHistoryService.usePoint(dto);
 
 		} catch (OptimisticLockingFailureException e) {
-			throw new RuntimeException("동시에 포인트 변동이 이뤄졌습니다. 다시 시도해주세요.");
+			throw new CustomException(CONCURRENTLY_CHANGED_POINTS);
 
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			throw e;  // 원본 예외를 다시 던지거나 적절히 처리
+			throw new CustomException(INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -37,10 +41,11 @@ public class PointHistoryApplication {
 			pointHistoryService.earnPoint(dto);
 
 		} catch (OptimisticLockingFailureException e) {
-			throw new RuntimeException("동시에 포인트 변동이 이뤄졌습니다. 다시 시도해주세요.");
+			throw new CustomException(CONCURRENTLY_CHANGED_POINTS);
+
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			throw e;
+			throw new CustomException(INTERNAL_SERVER_ERROR);
 		}
 	}
 

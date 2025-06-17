@@ -1,5 +1,6 @@
 package pp.coinwash.machine.service;
 
+import static pp.coinwash.common.exception.ErrorCode.*;
 import static pp.coinwash.machine.domain.type.MachineType.*;
 import static pp.coinwash.machine.event.MachineEvent.*;
 
@@ -12,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import pp.coinwash.common.exception.CustomException;
+import pp.coinwash.common.exception.ErrorCode;
 import pp.coinwash.history.domain.dto.HistoryRequestDto;
 import pp.coinwash.history.event.HistoryEvent;
 import pp.coinwash.machine.domain.dto.UsingDryingDto;
@@ -95,23 +98,23 @@ public class UsingMachineService {
 	private Machine verifyUsableMachine(long machineId, long customerId, MachineType machineType) {
 
 		Machine machine = machineRepository.findUsableMachineWithLock(machineId, machineType)
-			.orElseThrow(() -> new RuntimeException("해당하는 기계 정보가 없습니다."));
+			.orElseThrow(() -> new CustomException(NO_AVAILABLE_MACHINE));
 
 		if (machine.getUsageStatus() == UsageStatus.UNUSABLE) {
-			throw new RuntimeException("현재 사용할 수 없는 기계입니다.");
+			throw new CustomException(MACHINE_UNUSABLE);
 		}
 
 		if (machine.getEndTime() != null && machine.getEndTime().isAfter(LocalDateTime.now())) {
 
 			if (machine.getUsageStatus() == UsageStatus.USING) {
-				throw new RuntimeException("이미 사용중인 기계입니다.");
+				throw new CustomException(ALREADY_USING_MACHINE);
 			}
 
 			// 예약 중이라면 예약자 확인
 			if (machine.getUsageStatus() == UsageStatus.RESERVING) {
 
 				if (machine.getCustomerId() != customerId) {
-					throw new RuntimeException("예약자가 아닙니다.");
+					throw new CustomException(USER_NOT_RESERVED);
 				}
 				//예약금 환급
 				pointHistoryApplication.earnPoints(

@@ -1,5 +1,7 @@
 package pp.coinwash.machine.service;
 
+import static pp.coinwash.common.exception.ErrorCode.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import pp.coinwash.common.exception.CustomException;
+import pp.coinwash.common.exception.ErrorCode;
 import pp.coinwash.laundry.domain.entity.Laundry;
 import pp.coinwash.laundry.domain.repository.LaundryRepository;
 import pp.coinwash.machine.domain.dto.MachineRegisterDto;
@@ -68,12 +72,12 @@ public class MachineManageService {
 
 	private Laundry getValidateLaundry(long laundryId, long ownerId) {
 		return laundryRepository.findByLaundryIdAndOwnerIdAndDeletedAtIsNull(laundryId, ownerId)
-			.orElseThrow(() -> new RuntimeException("해당하는 세탁소 정보를 찾을 수 없습니다."));
+			.orElseThrow(() -> new CustomException(NO_AUTHORIZED_MACHINE_FOUND));
 	}
 
 	private Machine getValidateMachine(long machineId, long ownerId) {
 
 		return machineRepository.findByMachineIdAndLaundryOwnerId(machineId, ownerId)
-			.orElseThrow(() -> new RuntimeException("권한을 지닌 기계 정보를 찾을 수 없습니다."));
+			.orElseThrow(() -> new CustomException(NO_AUTHORIZED_MACHINE_FOUND));
 	}
 }

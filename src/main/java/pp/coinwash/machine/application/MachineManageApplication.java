@@ -1,5 +1,7 @@
 package pp.coinwash.machine.application;
 
+import static pp.coinwash.common.exception.ErrorCode.*;
+
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -8,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import io.lettuce.core.RedisException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import pp.coinwash.common.exception.CustomException;
+import pp.coinwash.common.exception.ErrorCode;
 import pp.coinwash.machine.domain.dto.MachineRegisterDto;
 import pp.coinwash.machine.domain.dto.MachineResponseDto;
 import pp.coinwash.machine.domain.dto.MachineUpdateDto;
@@ -67,7 +71,7 @@ public class MachineManageApplication {
 		} catch (RedisException e) {
 
 			log.error("세탁소 기계 데이터 목록 {} Redis 저장 실패로 전체 롤백", laundryId, e);
-			throw new RuntimeException("세탁소 기계 목록 저장에 실패했습니다", e);
+			throw new CustomException(FAILED_TO_SAVE_MACHINES);
 		}
 	}
 
@@ -80,7 +84,7 @@ public class MachineManageApplication {
 
 		} catch (RedisException e) {
 			log.error("기계 {} Redis 업데이트 실패로 전체 롤백", updateDto.machineId(), e);
-			throw new RuntimeException("기계 상태 업데이트에 실패했습니다", e);
+			throw new CustomException(FAILED_TO_UPDATE_MACHINES);
 		}
 	}
 
@@ -93,7 +97,7 @@ public class MachineManageApplication {
 
 		} catch (RedisException e) {
 			log.error("기계 {} Redis 데이터 삭제 실패로 전체 롤백", machineId, e);
-			throw new RuntimeException("기계 상태 업데이트에 실패했습니다", e);
+			throw new CustomException(FAILED_TO_DELETE_MACHINES);
 		}
 	}
 }

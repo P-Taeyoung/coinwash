@@ -1,5 +1,7 @@
 package pp.coinwash.notification.service;
 
+import static pp.coinwash.common.exception.ErrorCode.*;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -10,8 +12,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import pp.coinwash.common.exception.CustomException;
 import pp.coinwash.notification.domain.dto.NotificationRequestDto;
-import pp.coinwash.notification.domain.dto.repository.SseEmitterRepository;
+import pp.coinwash.notification.domain.repository.SseEmitterRepository;
 
 @Service
 @Slf4j
@@ -53,7 +56,7 @@ public class SseEmitterService {
 			);
 		} catch (IOException e) {
 			log.error("SSE 알림 전송 실패: 대상자 Id: {}, 원인: {}", dto.customerId(), e.getMessage());
-			throw new RuntimeException("SSE 알림 전송 실패");
+			throw new CustomException(FAILED_TO_SEND_SSE_MESSAGE);
 		}
 
 	}
@@ -74,7 +77,7 @@ public class SseEmitterService {
 				log.debug("하트비트 전송 성공: 사용자 Id: {}", customerId);
 			} catch (IOException e) {
 				log.error("하트비트 전송 실패: 사용자 Id: {}, 원인: {}", customerId, e.getMessage());
-				throw new RuntimeException("SSE 연결 실패");
+				throw new CustomException(FAILED_TO_CONNECT_SSE);
 			}
 		});
 	}
@@ -94,7 +97,7 @@ public class SseEmitterService {
 			log.info("SSE 연결 성공: 사용자 Id: {}", customerId);
 		} catch (IOException e) {
 			log.error("SSE 연결 실패: 사용자 Id: {}, 원인: {}", customerId, e.getMessage());
-			throw new RuntimeException("SSE 연결 실패");
+			throw new CustomException(FAILED_TO_CONNECT_SSE);
 		}
 	}
 }
