@@ -1,5 +1,7 @@
 package pp.coinwash.laundry.service;
 
+import static pp.coinwash.common.exception.ErrorCode.*;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import pp.coinwash.common.dto.PagedResponseDto;
+import pp.coinwash.common.exception.CustomException;
+import pp.coinwash.common.exception.ErrorCode;
 import pp.coinwash.laundry.domain.dto.LaundryRegisterDto;
 import pp.coinwash.laundry.domain.dto.LaundryResponseDto;
 import pp.coinwash.laundry.domain.dto.LaundryUpdateDto;
@@ -46,12 +50,12 @@ public class LaundryManageService {
 
 	private Laundry validateLaundry (long laundryId, long ownerId) {
 		return laundryRepository.findByLaundryIdAndOwnerIdAndDeletedAtIsNull(laundryId, ownerId)
-			.orElseThrow(() -> new RuntimeException("해당하는 코인세탁방 정보를 찾을 수 없습니다."));
+			.orElseThrow(() -> new CustomException(NO_AUTHORIZED_LAUNDRY_FOUND));
 	}
 
 	private void isAbleToRegister(LaundryRegisterDto dto) {
 		if(laundryRepository.existsWithinDistance(dto.longitude(), dto.latitude(), 500)) {
-			throw new RuntimeException("500m 내 이미 코인 세탁방이 존재합니다.");
+			throw new CustomException(LAUNDRY_ALREADY_EXISTS_NEARBY);
 		}
 	}
 }

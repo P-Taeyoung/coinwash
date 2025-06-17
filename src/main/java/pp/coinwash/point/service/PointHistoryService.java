@@ -1,5 +1,7 @@
 package pp.coinwash.point.service;
 
+import static pp.coinwash.common.exception.ErrorCode.*;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -7,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import pp.coinwash.common.exception.CustomException;
+import pp.coinwash.common.exception.ErrorCode;
 import pp.coinwash.point.domain.dto.PointHistoryRequestDto;
 import pp.coinwash.point.domain.entity.PointHistory;
 import pp.coinwash.point.domain.repository.PointHistoryRepository;
@@ -25,10 +29,10 @@ public class PointHistoryService {
 	public void usePoint(PointHistoryRequestDto dto) {
 		// try {
 			Customer customer = customerRepository.findValidateCustomerToUsePoints(dto.customerId())
-				.orElseThrow(() -> new RuntimeException("해당하는 사용자를 찾을 수 없습니다."));
+				.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
 			if (customer.getPoints() < dto.changedPoint()) {
-				throw new RuntimeException("포인트가 부족합니다.");
+				throw new CustomException(INSUFFICIENT_POINTS);
 			}
 
 			customer.usePoints(dto.changedPoint());
@@ -40,7 +44,7 @@ public class PointHistoryService {
 	public void earnPoint(PointHistoryRequestDto dto) {
 
 			Customer customer = customerRepository.findValidateCustomerToUsePoints(dto.customerId())
-				.orElseThrow(() -> new RuntimeException("해당하는 사용자를 찾을 수 없습니다."));
+				.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
 			customer.earnPoints(dto.changedPoint());
 

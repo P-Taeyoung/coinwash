@@ -105,7 +105,7 @@ public class PointHistoryServiceConcurrencyTest {
 		// 나머지는 낙관적 락 예외가 발생해야 함
 		assertThat(exceptions.size()).isEqualTo(4);
 		exceptions.forEach(e ->
-			assertThat(e.getMessage()).contains("동시에 포인트 변동이 이뤄졌습니다. 다시 시도해주세요.")
+			assertThat(e.getMessage()).contains("동시에 포인트 변경 시도가 이루어졌습니다. 잠시 후에 다시 시도해주세요.")
 		);
 
 		// 최종 포인트 확인

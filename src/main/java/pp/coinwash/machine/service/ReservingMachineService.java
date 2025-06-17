@@ -1,5 +1,6 @@
 package pp.coinwash.machine.service;
 
+import static pp.coinwash.common.exception.ErrorCode.*;
 import static pp.coinwash.machine.event.MachineEvent.*;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import pp.coinwash.common.exception.CustomException;
 import pp.coinwash.history.domain.dto.HistoryRequestDto;
 import pp.coinwash.history.event.HistoryEvent;
 import pp.coinwash.machine.domain.entity.Machine;
@@ -71,13 +73,13 @@ public class ReservingMachineService {
 	private Machine getCanReserveMachine(long machineId) {
 
 		return machineRepository.findUsableMachineByMachineId(machineId, LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
-			.orElseThrow(() -> new RuntimeException("예약가능한 기계 정보가 없습니다."));
+			.orElseThrow(() -> new CustomException(NO_AVAILABLE_MACHINE));
 	}
 
 	private Machine getCancelReserveMachine(long machineId, long customerId) {
 
 		return machineRepository.findReserveMachine(machineId, customerId)
-			.orElseThrow(() -> new RuntimeException("예약한 기계 정보가 없습니다."));
+			.orElseThrow(() -> new CustomException(RESERVED_MACHINE_NOT_FOUND));
 	}
 
 	private void publishHistoryEventSafely(HistoryRequestDto dto, Machine machine) {

@@ -18,6 +18,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
+import pp.coinwash.common.exception.CustomException;
+import pp.coinwash.common.exception.ErrorCode;
 import pp.coinwash.history.domain.type.WashingCourse;
 import pp.coinwash.history.event.HistoryEvent;
 import pp.coinwash.machine.domain.dto.UsingWashingDto;
@@ -133,11 +135,11 @@ class ReservingMachineServiceTest {
 			.thenReturn(Optional.empty());
 
 		//then
-		RuntimeException exception =
-			assertThrows(RuntimeException.class,
+		CustomException exception =
+			assertThrows(CustomException.class,
 				() -> reservingMachineService.cancelReserveMachine(machineId, customerId));
 
-		assertEquals("예약한 기계 정보가 없습니다.", exception.getMessage());
+		assertEquals(ErrorCode.RESERVED_MACHINE_NOT_FOUND.getMessage(), exception.getMessage());
 	}
 
 }

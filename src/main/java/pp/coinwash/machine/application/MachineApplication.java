@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import io.lettuce.core.RedisException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import pp.coinwash.common.exception.CustomException;
+import pp.coinwash.common.exception.ErrorCode;
 import pp.coinwash.machine.domain.dto.UsingDryingDto;
 import pp.coinwash.machine.domain.dto.UsingWashingDto;
 import pp.coinwash.machine.domain.entity.Machine;
@@ -76,7 +78,7 @@ public class MachineApplication {
 
 		} catch (RedisException e) {
 			log.error("기계 {} Redis 데이터 업데이트 실패로 전체 롤백", machineId, e);
-			throw new RuntimeException(errorMessage, e);
+			throw new CustomException(ErrorCode.FAILED_TO_CHANGE_MACHINE_STATUS);
 		}
 	}
 }

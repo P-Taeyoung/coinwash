@@ -1,10 +1,14 @@
 package pp.coinwash.user.service;
 
+import static pp.coinwash.common.exception.ErrorCode.*;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import pp.coinwash.common.exception.CustomException;
+import pp.coinwash.common.exception.ErrorCode;
 import pp.coinwash.security.JwtProvider;
 import pp.coinwash.security.dto.UserAuthDto;
 import pp.coinwash.user.domain.dto.OwnerResponseDto;
@@ -47,10 +51,10 @@ public class OwnerService {
 
 	private Owner validateId(UserSignInDto dto) {
 		Owner owner = ownerRepository.findByLoginIdAndDeletedAtIsNull(dto.signInId())
-			.orElseThrow(() -> new RuntimeException("일치하는 아이디가 없습니다."));
+			.orElseThrow(() -> new CustomException(INVALID_CREDENTIALS));
 
 		if (!passwordEncoder.matches(dto.password(), owner.getPassword())) {
-			throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+			throw new CustomException(INVALID_CREDENTIALS);
 		}
 
 		return owner;
@@ -58,12 +62,12 @@ public class OwnerService {
 
 	private void existsId(String Id) {
 		if (ownerRepository.existsByLoginIdAndDeletedAtIsNull(Id)) {
-			throw new RuntimeException("이미 존재하는 아이디입니다.");
+			throw new CustomException(ALREADY_EXISTS_ID);
 		}
 	}
 
 	private Owner validateOwner(long customerId) {
 		return ownerRepository.findByOwnerIdAndDeletedAtIsNull(customerId)
-			.orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+			.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 	}
 }
