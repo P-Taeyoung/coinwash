@@ -1,5 +1,7 @@
 package pp.coinwash.common.exception;
 
+import org.springframework.http.HttpStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +15,16 @@ public enum ErrorCode {
 	WRONG_TOKEN_PREFIX(400,  "토큰 접두사가 올바르지 않습니다."),
 	INVALID_CREDENTIALS(401,  "아이디 또는 비밀번호가 올바르지 않습니다."),
 
+	/* 401 UNAUTHORIZED */
+	AUTHENTICATION_FAILED(401, "사용자 인증에 실패했습니다."),
+	TOKEN_EXPIRED(401, "토큰이 만료되었습니다."),
+	INVALID_TOKEN_FORMAT(401, "유효하지 않은 토큰 형식입니다."),
+	INVALID_TOKEN(401, "유효하지 않은 토큰입니다."),
+	TOKEN_PARSING_ERROR(401, "토큰 파싱 중 오류가 발생했습니다."),
+	AUTHENTICATION_REQUIRED(401, "인증이 필요합니다."),
+
 	/* 403 FORBIDDEN */
+	FORBIDDEN(403, "권한이 없습니다."),
 	USER_NOT_RESERVED(403, "예약자가 아닙니다."),
 
 	/* 404 NOT_FOUND */
@@ -40,6 +51,7 @@ public enum ErrorCode {
 	FAILED_TO_UPDATE_MACHINES(500, "기계 정보 업데이트에 실패했습니다."),
 	FAILED_TO_DELETE_MACHINES(500, "기계 정보 삭제에 실패했습니다."),
 	FAILED_TO_CHANGE_MACHINE_STATUS(500, "기계 상태 변경에 실패했습니다."),
+	INTERNAL_AUTHENTICATION_ERROR(500, "인증 처리 중 내부 오류가 발생했습니다."),
 
 	/* SSE_ERROR */
 	FAILED_TO_SEND_SSE_MESSAGE(500,  "SSE 메시지 전송에 실패했습니다."),

@@ -7,15 +7,18 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.DecodingException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import pp.coinwash.security.dto.CustomUserDetails;
 import pp.coinwash.security.dto.UserAuthDto;
@@ -71,15 +74,30 @@ public class JwtProvider {
 				.build()
 				.parseSignedClaims(token)
 				.getPayload();
+
 		} catch (ExpiredJwtException e) {
 			log.error("Token expired: {}", e.getMessage());
-			return e.getClaims();
-		} catch (DecodingException e) {
-			log.error("Decoding error: {}", e.getMessage());
-			throw new RuntimeException("Invalid token format", e);
+			throw new CredentialsExpiredException("토큰이 만료되었습니다.", e);
+
+		} catch (MalformedJwtException e) {
+			log.error("Malformed JWT: {}", e.getMessage());
+			throw new BadCredentialsException("잘못된 형식의 토큰입니다.", e);
+
+		} catch (UnsupportedJwtException e) {
+			log.error("Unsupported JWT: {}", e.getMessage());
+			throw new BadCredentialsException("지원되지 않는 토큰입니다.", e);
+
+		} catch (IllegalArgumentException e) {
+			log.error("JWT claims string is empty: {}", e.getMessage());
+			throw new BadCredentialsException("토큰 클레임이 비어있습니다.", e);
+
+		} catch (io.jsonwebtoken.security.SignatureException e) {
+			log.error("Invalid JWT signature: {}", e.getMessage());
+			throw new BadCredentialsException("유효하지 않은 토큰 서명입니다.", e);
+
 		} catch (Exception e) {
 			log.error("Unknown error during token parsing: {}", e.getMessage());
-			throw new RuntimeException("Unknown error during token parsing", e);
+			throw new InternalAuthenticationServiceException("토큰 파싱 중 알 수 없는 오류가 발생했습니다.", e);
 		}
 	}
 
