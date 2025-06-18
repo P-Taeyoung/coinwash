@@ -7,6 +7,20 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: user
     password: 1234
+    hikari:
+      # 🎯 성능 개선
+      maximum-pool-size: 15
+      minimum-idle: 5
+      connection-timeout: 20000
+
+      # 🔍 모니터링 활성화
+      register-mbeans: true
+      leak-detection-threshold: 60000
+
+      # 🔧 추가 최적화 옵션들
+      idle-timeout: 300000          # 5분 (기본 10분보다 짧게)
+      max-lifetime: 900000          # 15분 (기본 30분보다 짧게)
+      validation-timeout: 5000      # 5초 (기본값)
 
   jpa:
     show-sql: true
@@ -27,10 +41,7 @@ kakao:
     key: ${KAKAO_API_KEY}
 
 
-#logging:
-#  level:
-#    org:
-#      hibernate:
-#        SQL: debug
-#        type.descriptor.sql: trace
-#    org.hibernate.orm.jdbc.bind: trace
+logging:
+  level:
+    com.zaxxer.hikari: DEBUG
+
