@@ -3,6 +3,8 @@ package pp.coinwash.security.filter;
 import java.io.IOException;
 import java.util.stream.Collectors;
 
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -43,20 +45,31 @@ public class JwtFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		String token = tokenFromHeader(request);
+		try {
 
-		if (token == null) {
-			filterChain.doFilter(request, response);
-			return;
+			String token = tokenFromHeader(request);
+
+			if (token == null) {
+				filterChain.doFilter(request, response);
+				return;
+			}
+
+			SecurityContextHolder.getContext().setAuthentication(jwtProvider.getAuthentication(token));
+
+			CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+				.getAuthentication().getPrincipal();
+			log.info("사용자 정보: {}, {}, {}", userDetails.getUserId(), userDetails.getUsername(),
+				userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+
+		} catch (AuthenticationException e) {
+
+			log.error("JWT 인증 실패: {}", e.getMessage());
+			throw e;
+		} catch (Exception e) {
+
+			log.error("JWT 처리 중 예상치 못한 오류: {}", e.getMessage());
+			throw new InternalAuthenticationServiceException("JWT 처리 중 오류 발생", e);
 		}
-
-		SecurityContextHolder.getContext().setAuthentication(jwtProvider.getAuthentication(token));
-
-		//TODO 추후 사용자 정보 축소
-		CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
-			.getAuthentication().getPrincipal();
-		log.info("사용자 정보: {}, {}, {}", userDetails.getUserId(), userDetails.getUsername(),
-			userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
 
 		filterChain.doFilter(request, response);
 	}
