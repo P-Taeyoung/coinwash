@@ -1,5 +1,7 @@
 package pp.coinwash.security;
 
+import static pp.coinwash.security.filter.JwtFilter.*;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
@@ -13,6 +15,7 @@ import org.springframework.security.authentication.InternalAuthenticationService
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -51,9 +54,32 @@ public class JwtProvider {
 	}
 
 
-	public Authentication getAuthentication(String token) {
+	public Authentication getAuthentication(String authHeader) {
+
+		String token = extractTokenFromHeader(authHeader);
+
 		CustomUserDetails userDetails = new CustomUserDetails(getUserFromToken(token));
 		return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+	}
+
+	private String extractTokenFromHeader(String authHeader) {
+		log.info("Authorization Header: {}", authHeader);
+
+		if (!StringUtils.hasText(authHeader)) {
+			return null; // 헤더가 없으면 null 반환
+		}
+
+		if (!authHeader.startsWith(TOKEN_PREFIX)) {
+			throw new BadCredentialsException("잘못된 토큰 형식입니다. Bearer 접두사가 필요합니다.");
+		}
+
+		String token = authHeader.substring(TOKEN_PREFIX.length()).trim();
+
+		if (!StringUtils.hasText(token)) {
+			throw new BadCredentialsException("토큰이 비어있습니다.");
+		}
+
+		return token;
 	}
 
 	private UserAuthDto getUserFromToken(String token) {

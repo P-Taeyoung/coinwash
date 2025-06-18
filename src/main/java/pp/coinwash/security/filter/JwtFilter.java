@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,29 +38,21 @@ public class JwtFilter extends OncePerRequestFilter {
 		String requestURI = request.getRequestURI();
 		log.info("requestURI: {}", requestURI);
 
-		if (requestURI.startsWith("/swagger-ui/")
-			|| requestURI.startsWith("/v3/api-docs")
-			|| requestURI.startsWith("/login")
-		) {
+		if (isExcludedPath(requestURI)) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 
 		try {
 
-			String token = tokenFromHeader(request);
+			String authHeader = request.getHeader(TOKEN_HEADER);
 
-			if (token == null) {
-				filterChain.doFilter(request, response);
-				return;
+			Authentication authentication = jwtProvider.getAuthentication(authHeader);
+
+			if (authentication != null) {
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+				logUserInfo(authentication);
 			}
-
-			SecurityContextHolder.getContext().setAuthentication(jwtProvider.getAuthentication(token));
-
-			CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
-				.getAuthentication().getPrincipal();
-			log.info("사용자 정보: {}, {}, {}", userDetails.getUserId(), userDetails.getUsername(),
-				userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
 
 		} catch (AuthenticationException e) {
 
@@ -74,19 +67,23 @@ public class JwtFilter extends OncePerRequestFilter {
 		filterChain.doFilter(request, response);
 	}
 
-	private String tokenFromHeader(HttpServletRequest request) {
-		String token = request.getHeader(TOKEN_HEADER);
-		log.info("Token : {}", token);
+	private boolean isExcludedPath(String requestURI) {
+		return requestURI.startsWith("/swagger-ui/")
+			|| requestURI.startsWith("/v3/api-docs")
+			|| requestURI.startsWith("/swagger-resources")
+			|| requestURI.startsWith("/webjars/")
+			|| requestURI.equals("/favicon.ico")
+			|| requestURI.startsWith("/login")
+			|| requestURI.startsWith("/error");
+	}
 
-		if (!StringUtils.hasText(token)) {
-			return null;
-		}
-
-		// 토큰 형식이 잘못된 경우 예외 발생
-		if (!token.startsWith(TOKEN_PREFIX)) {
-			throw new RuntimeException("잘못된 토큰 형식입니다.");
-		}
-
-		return token.substring(TOKEN_PREFIX.length()).trim();
+	private void logUserInfo(Authentication authentication) {
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		log.info("사용자 정보: {}, {}, {}",
+			userDetails.getUserId(),
+			userDetails.getUsername(),
+			userDetails.getAuthorities().stream()
+				.map(GrantedAuthority::getAuthority)
+				.collect(Collectors.toList()));
 	}
 }
