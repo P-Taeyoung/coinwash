@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -21,6 +22,7 @@ import pp.coinwash.laundry.domain.dto.LaundryRegisterDto;
 import pp.coinwash.laundry.domain.dto.LaundryResponseDto;
 import pp.coinwash.laundry.domain.dto.LaundryUpdateDto;
 import pp.coinwash.laundry.service.LaundryManageService;
+import pp.coinwash.security.dto.CustomUserDetails;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,10 +38,10 @@ public class LaundryManageController {
 		description = "점주 권한을 지닌 사용자가 세탁소를 등록, 이 때 500M 내 같은 세탁소가 존재한다면 등록 불가."
 	)
 	@PostMapping
-	public ResponseEntity<String> registerLaundry(@RequestParam long ownerId
+	public ResponseEntity<String> registerLaundry(@AuthenticationPrincipal CustomUserDetails userDetails
 	, @RequestBody LaundryRegisterDto dto) {
 
-		laundryManageService.registerLaundry(dto, ownerId);
+		laundryManageService.registerLaundry(dto, userDetails.getUserId());
 		return ResponseEntity.ok("매장 등록이 완료되었습니다.");
 	}
 
@@ -50,11 +52,11 @@ public class LaundryManageController {
 	)
 	@GetMapping
 	public ResponseEntity<PagedResponseDto<LaundryResponseDto>> getLaundriesByOwnerId(
-		@RequestParam long ownerId,
+		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@PageableDefault(sort = "laundryId", direction = Sort.Direction.DESC)
 		Pageable pageable) {
 
-		return ResponseEntity.ok(laundryManageService.getLaundriesByOwnerId(ownerId, pageable));
+		return ResponseEntity.ok(laundryManageService.getLaundriesByOwnerId(userDetails.getUserId(), pageable));
 	}
 
 	@Operation(
@@ -65,10 +67,10 @@ public class LaundryManageController {
 	@PatchMapping
 	public ResponseEntity<String> updateLaundry(
 		@RequestParam long laundryId,
-		@RequestParam long ownerId,
+		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@RequestBody LaundryUpdateDto dto) {
 
-		laundryManageService.updateLaundry(laundryId, ownerId, dto);
+		laundryManageService.updateLaundry(laundryId, userDetails.getUserId(), dto);
 		return ResponseEntity.ok("매장 정보 수정이 완료되었습니다.");
 	}
 
@@ -80,9 +82,9 @@ public class LaundryManageController {
 	@DeleteMapping
 	public ResponseEntity<String> deleteLaundry(
 		@RequestParam long laundryId,
-		@RequestParam long ownerId) {
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-		laundryManageService.deleteLaundry(laundryId, ownerId);
+		laundryManageService.deleteLaundry(laundryId, userDetails.getUserId());
 		return ResponseEntity.ok("매장 정보가 삭제되었습니다.");
 	}
 
@@ -94,9 +96,9 @@ public class LaundryManageController {
 	@PatchMapping("/status")
 	public ResponseEntity<String> changeLaundryStatus(
 		@RequestParam long laundryId,
-		@RequestParam long ownerId) {
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-		laundryManageService.changeLaundryStatus(laundryId, ownerId);
+		laundryManageService.changeLaundryStatus(laundryId, userDetails.getUserId());
 		return ResponseEntity.ok("매장 운영 현황이 변경되었습니다.");
 	}
 }

@@ -1,6 +1,7 @@
 package pp.coinwash.user.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import pp.coinwash.security.dto.CustomUserDetails;
 import pp.coinwash.user.domain.dto.OwnerResponseDto;
 import pp.coinwash.user.domain.dto.OwnerSignUpDto;
 import pp.coinwash.user.domain.dto.OwnerUpdateDto;
@@ -51,9 +53,8 @@ public class OwnerController {
 		tags = {"점주 회원 관리"}
 	)
 	@GetMapping
-	//TODO 추후 ContextHolder 에서 고객id 를 가져올 수 있도록
-	public ResponseEntity<OwnerResponseDto> getOwner(@RequestParam long ownerId) {
-		return ResponseEntity.ok(ownerService.getOwner(ownerId));
+	public ResponseEntity<OwnerResponseDto> getOwner(@AuthenticationPrincipal CustomUserDetails userDetails) {
+		return ResponseEntity.ok(ownerService.getOwner(userDetails.getUserId()));
 	}
 
 	@Operation(
@@ -62,9 +63,9 @@ public class OwnerController {
 		description = "점주 회원 전화번호 수정 가능."
 	)
 	@PatchMapping
-	public ResponseEntity<String> updateOwner(@RequestParam long ownerId
+	public ResponseEntity<String> updateOwner(@AuthenticationPrincipal CustomUserDetails userDetails
 		,@RequestBody OwnerUpdateDto dto) {
-		ownerService.updateOwner(ownerId, dto);
+		ownerService.updateOwner(userDetails.getUserId(), dto);
 		return ResponseEntity.ok("회원정보가 수정되었습니다.");
 	}
 
@@ -74,8 +75,8 @@ public class OwnerController {
 		description = "점주 회원 탈퇴 시 DB 에서 정보가 완전히 삭제되는 것이 아닌 삭제일자 추가."
 	)
 	@DeleteMapping
-	public ResponseEntity<String> deleteOwner(@RequestParam long ownerId) {
-		ownerService.deleteOwner(ownerId);
+	public ResponseEntity<String> deleteOwner(@AuthenticationPrincipal CustomUserDetails userDetails) {
+		ownerService.deleteOwner(userDetails.getUserId());
 		return ResponseEntity.ok("회원 탈퇴되었습니다.");
 	}
 }

@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,7 @@ import pp.coinwash.machine.domain.repository.MachineRepository;
 import pp.coinwash.history.domain.dto.HistoryRequestDto;
 import pp.coinwash.history.domain.dto.HistoryResponseDto;
 import pp.coinwash.history.service.HistoryService;
+import pp.coinwash.security.dto.CustomUserDetails;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,12 +38,12 @@ public class HistoryController {
 	)
 	@GetMapping
 	public ResponseEntity<PagedResponseDto<HistoryResponseDto>> getUsageHistories(
-		@RequestParam long customerId,
+		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@PageableDefault(sort = "historyId", direction = Sort.Direction.DESC)
 		Pageable pageable) {
 
 		return ResponseEntity.ok(historyService
-			.getUsageHistoriesByCustomerId(customerId, pageable));
+			.getUsageHistoriesByCustomerId(userDetails.getUserId(), pageable));
 	}
 
 

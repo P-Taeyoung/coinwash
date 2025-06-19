@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import pp.coinwash.common.dto.PagedResponseDto;
 import pp.coinwash.point.application.PointHistoryApplication;
 import pp.coinwash.point.domain.dto.PointHistoryRequestDto;
 import pp.coinwash.point.domain.dto.PointHistoryResponseDto;
+import pp.coinwash.security.dto.CustomUserDetails;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,11 +35,11 @@ public class PointHistoryController {
 	)
 	@GetMapping
 	public ResponseEntity<PagedResponseDto<PointHistoryResponseDto>> getPointHistory(
-		@RequestParam long customerId,
+		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@PageableDefault(sort = "pointHistoryId", direction = Sort.Direction.DESC)
 		Pageable pageable) {
 
-		return ResponseEntity.ok(pointHistoryApplication.getPointHistory(customerId, pageable));
+		return ResponseEntity.ok(pointHistoryApplication.getPointHistory(userDetails.getUserId(), pageable));
 	}
 
 	@Operation(
@@ -46,9 +48,9 @@ public class PointHistoryController {
 		description = "고객 포인트 충전. 동시에 포인트 데이터에 접근하는 경우 가장 첫번째로 접근한 요청만 성공."
 	)
 	@PatchMapping
-	public ResponseEntity<String> earnPoint(@RequestParam long customerId, @RequestParam int points) {
+	public ResponseEntity<String> earnPoint(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam int points) {
 
-		pointHistoryApplication.earnPoints(PointHistoryRequestDto.earnPoint(customerId, points));
+		pointHistoryApplication.earnPoints(PointHistoryRequestDto.earnPoint(userDetails.getUserId(), points));
 		return ResponseEntity.ok(points + "포인트가 적립되었습니다.");
 	}
 
