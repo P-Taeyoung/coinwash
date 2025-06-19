@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: coinwash
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+
+  datasource:
+    url: jdbc:mysql://mysql:3306/coinwash?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: user
+    password: ${MYSQL_PASSWORD}
+    hikari:
+      # 🎯 성능 개선
+      maximum-pool-size: 15
+      minimum-idle: 5
+      connection-timeout: 20000
+
+      # 🔍 모니터링 활성화
+      register-mbeans: true
+      leak-detection-threshold: 60000
+
+      # 🔧 추가 최적화 옵션들
+      idle-timeout: 300000          # 5분 (기본 10분보다 짧게)
+      max-lifetime: 900000          # 15분 (기본 30분보다 짧게)
+      validation-timeout: 5000      # 5초 (기본값)
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+          # 운영환경 최적화
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  jwt:
+    secret: ${JWT_SECRET_KEY}
+
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: ${REDIS_PASSWORD}
+      timeout: 2000ms  # 연결 타임아웃 설정
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+kakao:
+  api:
+    key: ${KAKAO_API_KEY}
+
+
+# 운영환경 로깅 설정
+logging:
+  level:
+    root: INFO
+    com.coinwash: INFO
+    com.zaxxer.hikari: DEBUG  # DEBUG는 너무 많은 로그 생성
+    org.springframework.data.redis: WARN
