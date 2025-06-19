@@ -3,6 +3,7 @@ package pp.coinwash.machine.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -19,6 +20,7 @@ import pp.coinwash.machine.application.MachineManageApplication;
 import pp.coinwash.machine.domain.dto.MachineRegisterDto;
 import pp.coinwash.machine.domain.dto.MachineResponseDto;
 import pp.coinwash.machine.domain.dto.MachineUpdateDto;
+import pp.coinwash.security.dto.CustomUserDetails;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,8 +39,9 @@ public class MachineManageController {
 	public ResponseEntity<String> registerMachine(
 		@RequestBody List<MachineRegisterDto> dtos,
 		@RequestParam long laundryId,
-		@RequestParam long ownerId) {
-		machineManageApplication.registerMachines(dtos, laundryId, ownerId);
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+		machineManageApplication.registerMachines(dtos, laundryId, userDetails.getUserId());
 
 		return ResponseEntity.ok("기계정보가 정상적으로 저장되었습니다.");
 	}
@@ -51,6 +54,7 @@ public class MachineManageController {
 	@GetMapping
 	public ResponseEntity<List<MachineResponseDto>> getMachines(
 		@RequestParam long laundryId) {
+
 		return ResponseEntity.ok(machineManageApplication.getMachinesByLaundryId(laundryId));
 	}
 
@@ -62,8 +66,9 @@ public class MachineManageController {
 	@PatchMapping
 	public ResponseEntity<String> updateMachine(
 		@RequestBody MachineUpdateDto dto,
-		@RequestParam long ownerId) {
-		machineManageApplication.updateMachine(dto, ownerId);
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+		machineManageApplication.updateMachine(dto, userDetails.getUserId());
 		return ResponseEntity.ok("기계정보가 정상적으로 수정되었습니다.");
 	}
 
@@ -75,8 +80,9 @@ public class MachineManageController {
 	@DeleteMapping
 	public ResponseEntity<String> deleteMachine(
 		@RequestParam long machineId,
-		@RequestParam long ownerId) {
-		machineManageApplication.deleteMachine(machineId, ownerId);
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+		machineManageApplication.deleteMachine(machineId, userDetails.getUserId());
 		return ResponseEntity.ok("기계정보가 정상적으로 삭제되었습니다.");
 	}
 

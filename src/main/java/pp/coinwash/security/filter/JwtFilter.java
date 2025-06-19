@@ -47,11 +47,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
 			String authHeader = request.getHeader(TOKEN_HEADER);
 
-			Authentication authentication = jwtProvider.getAuthentication(authHeader);
+			if (authHeader != null) {
+				Authentication authentication = jwtProvider.getAuthentication(authHeader);
 
-			if (authentication != null) {
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-				logUserInfo(authentication);
+				if (authentication != null) {
+					SecurityContextHolder.getContext().setAuthentication(authentication);
+					logUserInfo(authentication);
+				}
 			}
 
 		} catch (AuthenticationException e) {
@@ -68,8 +70,8 @@ public class JwtFilter extends OncePerRequestFilter {
 	}
 
 	private boolean isExcludedPath(String requestURI) {
-		return requestURI.startsWith("/swagger-ui/")
-			|| requestURI.startsWith("/v3/api-docs")
+		return requestURI.startsWith("/swagger-ui/**")
+			|| requestURI.startsWith("/v3/api-docs/**")
 			|| requestURI.startsWith("/swagger-resources")
 			|| requestURI.startsWith("/webjars/")
 			|| requestURI.equals("/favicon.ico")

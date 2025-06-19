@@ -1,6 +1,7 @@
 package pp.coinwash.machine.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import pp.coinwash.machine.application.MachineApplication;
 import pp.coinwash.machine.domain.dto.UsingDryingDto;
 import pp.coinwash.machine.domain.dto.UsingWashingDto;
+import pp.coinwash.security.dto.CustomUserDetails;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,10 +32,10 @@ public class MachineController {
 		description = "세탁기 사용, 원하는 코스에 따라 필요한 포인트가 다름. 포인트 부족 시 사용 불가."
 	)
 	@PostMapping("/washing")
-	public ResponseEntity<String> useWashingMachine(@RequestParam long customerId,
+	public ResponseEntity<String> useWashingMachine(@AuthenticationPrincipal CustomUserDetails userDetails,
 		@RequestBody UsingWashingDto dto) {
 
-		machineApplication.useWashing(customerId, dto);
+		machineApplication.useWashing(userDetails.getUserId(), dto);
 
 		return ResponseEntity.ok("세탁을 시작합니다.");
 	}
@@ -44,10 +46,10 @@ public class MachineController {
 		description = "건조기 사용, 원하는 코스에 따라 필요한 포인트가 다름. 포인트 부족 시 사용 불가."
 	)
 	@PostMapping("/drying")
-	public ResponseEntity<String> useDryingMachine(@RequestParam long customerId,
+	public ResponseEntity<String> useDryingMachine(@AuthenticationPrincipal CustomUserDetails userDetails,
 		@RequestBody UsingDryingDto dto) {
 
-		machineApplication.useDrying(customerId, dto);
+		machineApplication.useDrying(userDetails.getUserId(), dto);
 
 		return ResponseEntity.ok("건조를 시작합니다.");
 	}
@@ -60,9 +62,9 @@ public class MachineController {
 	)
 	@PutMapping("/reservations")
 	public ResponseEntity<String> reserveMachine(@RequestParam long machineId,
-		@RequestParam long customerId) {
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-		machineApplication.reserveMachine(machineId, customerId);
+		machineApplication.reserveMachine(machineId, userDetails.getUserId());
 
 		return ResponseEntity.ok("예약되었습니다.");
 	}
@@ -74,9 +76,9 @@ public class MachineController {
 	)
 	@PatchMapping("/reservations")
 	public ResponseEntity<String> cancelReserveMachine(@RequestParam long machineId,
-		@RequestParam long customerId) {
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-		machineApplication.cancelReservingMachine(machineId, customerId);
+		machineApplication.cancelReservingMachine(machineId, userDetails.getUserId());
 
 		return ResponseEntity.ok("예약이 취소되었습니다.");
 	}

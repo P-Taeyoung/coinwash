@@ -51,9 +51,10 @@ public class SecurityConfig {
 			.authorizeHttpRequests(authorizeRequests ->
 				authorizeRequests
 					//TODO 허용할 경로 추가
-					.requestMatchers("/**").permitAll()
-					.requestMatchers("")
-					.permitAll()
+					.requestMatchers("/api/*/signup", "/api/*/signin",
+						"/swagger-ui/**", "/v3/api-docs/**", "/favicon.ico", "/error", "/api/address").permitAll()
+					.requestMatchers("/api/owner/**", "/api/machines").hasAuthority("OWNER")
+					.requestMatchers("/api/customer/**", "/api/machines/**", "/api/point").hasAuthority("CUSTOMER")
 					.anyRequest().authenticated());
 
 		http.addFilterBefore(jwtFilter, AuthorizationFilter.class);
