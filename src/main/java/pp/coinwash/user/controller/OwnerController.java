@@ -21,7 +21,7 @@ import pp.coinwash.user.service.OwnerService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/owner")
+@RequestMapping("/api/owner")
 @Tag(name = "점주 회원 관리", description = "점주 회원 관리 API")
 public class OwnerController {
 

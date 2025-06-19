@@ -51,7 +51,8 @@ public class SecurityConfig {
 			.authorizeHttpRequests(authorizeRequests ->
 				authorizeRequests
 					//TODO 허용할 경로 추가
-					.requestMatchers("/**")
+					.requestMatchers("/**").permitAll()
+					.requestMatchers("")
 					.permitAll()
 					.anyRequest().authenticated());
 
