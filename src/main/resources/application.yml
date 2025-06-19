@@ -6,7 +6,7 @@ spring:
     url: jdbc:mysql://localhost:3306/coinwash
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: user
-    password: 1234
+    password: ${MYSQL_PASSWORD}
     hikari:
       # 🎯 성능 개선
       maximum-pool-size: 15
@@ -28,13 +28,13 @@ spring:
       ddl-auto: update
 
   jwt:
-    secret: "vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb"
+    secret: ${JWT_SECRET_KEY}
 
   data:
     redis:
       host: localhost
       port: 6379
-      password: zerobase
+      password: ${REDIS_PASSWORD}
 
 kakao:
   api:
