@@ -20,8 +20,8 @@ public record CustomerResponseDto(
 			.phone(customer.getPhone())
 			.points(customer.getPoints())
 			.address(customer.getAddress())
-			.latitude(customer.getLatitude())
-			.longitude(customer.getLongitude())
+			.latitude(customer.getLocation().getY())
+			.longitude(customer.getLocation().getX())
 			.build();
 	}
 }
