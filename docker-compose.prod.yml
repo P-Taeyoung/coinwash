@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  # Spring Boot 애플리케이션만 포함
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: coinwash-app
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      # 🎯 RDS 관련 환경변수
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # 🎯 ElastiCache 관련 환경변수
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      # 🎯 기타 환경변수
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - KAKAO_API_KEY=${KAKAO_API_KEY}
+      - TZ=Asia/Seoul
+    ports:
+      - "80:8080"  # 웹 서비스용 80포트
+    volumes:
+      - ./logs:/app/logs
+    # ✅ depends_on 제거 (외부 서비스라서 불필요)
+    # ✅ networks 제거 (단일 서비스라서 불필요)
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      timeout: 20s
+      retries: 5
+      interval: 30s
+      start_period: 60s

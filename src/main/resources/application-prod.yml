@@ -7,62 +7,100 @@ spring:
       - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
 
   datasource:
-    url: jdbc:mysql://mysql:3306/coinwash?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    # 🎯 RDS 연결 설정으로 변경
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: user
-    password: ${MYSQL_PASSWORD}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     hikari:
-      # 🎯 성능 개선
-      maximum-pool-size: 15
-      minimum-idle: 5
-      connection-timeout: 20000
+      # 🎯 RDS 환경에 최적화된 커넥션 풀 설정
+      maximum-pool-size: 10        # RDS 연결 제한 고려하여 감소
+      minimum-idle: 3              # 최소 유지 연결 수
+      connection-timeout: 30000    # 30초 (RDS 네트워크 지연 고려)
 
       # 🔍 모니터링 활성화
       register-mbeans: true
       leak-detection-threshold: 60000
 
-      # 🔧 추가 최적화 옵션들
-      idle-timeout: 300000          # 5분 (기본 10분보다 짧게)
-      max-lifetime: 900000          # 15분 (기본 30분보다 짧게)
-      validation-timeout: 5000      # 5초 (기본값)
+      # 🔧 RDS 환경 최적화 옵션들
+      idle-timeout: 600000         # 10분 (RDS 연결 유지)
+      max-lifetime: 1800000        # 30분 (RDS 연결 재활용)
+      validation-timeout: 5000     # 5초
+
+      # 🌐 RDS 연결 안정성 향상
+      connection-test-query: SELECT 1
+      auto-commit: true
 
   jpa:
-    show-sql: false
+    show-sql: false                # 운영환경에서는 false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate           # 🚨 운영환경에서는 validate 사용!
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-          # 운영환경 최적화
+        # 운영환경 최적화
         jdbc:
           batch_size: 20
         order_inserts: true
         order_updates: true
-
-  jwt:
-    secret: ${JWT_SECRET_KEY}
+        # 🎯 RDS 성능 최적화
+        connection:
+          provider_disables_autocommit: true
 
   data:
     redis:
-      host: redis
-      port: 6379
-      password: ${REDIS_PASSWORD}
-      timeout: 2000ms  # 연결 타임아웃 설정
+      # 🎯 ElastiCache 연결 설정
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      # ElastiCache는 비밀번호 없이 사용하는 경우가 많음
+      # password: ${REDIS_PASSWORD}  # 필요시 주석 해제
+      timeout: 3000ms              # ElastiCache 네트워크 지연 고려
       lettuce:
         pool:
           max-active: 8
           max-idle: 8
-          min-idle: 0
+          min-idle: 2
+        # 🌐 ElastiCache 연결 안정성
+        shutdown-timeout: 100ms
 
+# JWT 설정
+jwt:
+  secret: ${JWT_SECRET_KEY}
+
+# 카카오 API 설정
 kakao:
   api:
     key: ${KAKAO_API_KEY}
 
-
-# 운영환경 로깅 설정
+# 🎯 운영환경 로깅 설정
 logging:
   level:
     root: INFO
     com.coinwash: INFO
-    com.zaxxer.hikari: DEBUG  # DEBUG는 너무 많은 로그 생성
+    org.springframework.web: WARN
     org.springframework.data.redis: WARN
+    com.zaxxer.hikari: INFO        # DEBUG에서 INFO로 변경 (로그 양 감소)
+    org.hibernate.SQL: WARN        # SQL 로그 비활성화
+    org.hibernate.type: WARN       # 파라미터 로그 비활성화
+
+  # 🗂️ 로그 파일 설정
+  file:
+    name: /app/logs/coinwash.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+
+# 🌐 서버 설정
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  tomcat:
+    # AWS 환경에 최적화된 Tomcat 설정
+    max-connections: 200
+    threads:
+      max: 200
+      min-spare: 10
+    connection-timeout: 20000
+    keep-alive-timeout: 60000
