@@ -3,9 +3,10 @@ spring:
     name: coinwash
 
   datasource:
-    url: jdbc:mysql://localhost:3306/coinwash
+    # 🔧 Docker 서비스명 사용 + 환경변수로 동적 설정
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql:3306/coinwash?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: user
+    username: ${SPRING_DATASOURCE_USERNAME:user}
     password: ${MYSQL_PASSWORD}
     hikari:
       # 🎯 성능 개선
@@ -32,14 +33,14 @@ spring:
 
   data:
     redis:
-      host: localhost
-      port: 6379
+      # 🔧 Docker 서비스명 사용
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD}
 
 kakao:
   api:
     key: ${KAKAO_API_KEY}
-
 
 logging:
   level:

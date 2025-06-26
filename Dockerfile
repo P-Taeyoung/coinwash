@@ -1,18 +1,27 @@
-# 1. 베이스 이미지 - OpenJDK 17 사용
-FROM openjdk:17-jdk-slim
+# 1단계: 빌드 스테이지
+FROM gradle:8-jdk17 as builder
 
-# 3. 작업 디렉토리 설정
 WORKDIR /app
 
-# 4. JAR 파일을 컨테이너로 복사
-# Gradle 빌드 결과물 복사
-COPY build/libs/coinwash-*.jar coinwash-app.jar
+COPY build.gradle settings.gradle ./
+COPY gradle gradle
+COPY gradlew ./
 
-# 5. 포트 노출 (Spring Boot 기본 포트)
+RUN ./gradlew dependencies --no-daemon
+
+COPY src src
+
+RUN ./gradlew clean build -x test --no-daemon
+
+# 2단계: 실행 스테이지 - Amazon Corretto
+FROM amazoncorretto:17
+
+WORKDIR /app
+
+COPY --from=builder /app/build/libs/coinwash-*.jar coinwash-app.jar
+
 EXPOSE 8080
 
-# 6. 애플리케이션 실행 명령어
 ENTRYPOINT ["java", \
-    "-Dspring.profiles.active=prod", \
-    "-Dspring.config.activate.on-profile=prod", \
+    "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE:}", \
     "-jar", "coinwash-app.jar"]

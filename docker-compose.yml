@@ -24,7 +24,7 @@ services:
     networks:
       - coinwash-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-p${MYSQL_PASSWORD}"]
+      test: ["CMD", "sh", "-c", "mysqladmin ping -h localhost -u user -p$$MYSQL_PASSWORD"]
       timeout: 20s
       retries: 10
       interval: 10s
@@ -37,7 +37,15 @@ services:
     restart: unless-stopped
     environment:
       TZ: Asia/Seoul
-    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes --appendfsync everysec
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command:
+      - redis-server
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --appendonly
+      - "yes"
+      - --appendfsync
+      - everysec
     ports:
       - "6379:6379"
     volumes:
@@ -45,7 +53,7 @@ services:
     networks:
       - coinwash-network
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      test: [ "CMD", "sh", "-c", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep PONG" ]
       timeout: 20s
       retries: 5
       interval: 10s
@@ -58,13 +66,8 @@ services:
       dockerfile: Dockerfile
     container_name: coinwash-app
     restart: unless-stopped
-    environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - KAKAO_API_KEY=${KAKAO_API_KEY}
-      - TZ=Asia/Seoul
+    env_file:
+      - .env
     ports:
       - "8080:8080"
     volumes:
