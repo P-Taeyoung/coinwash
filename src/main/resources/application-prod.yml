@@ -29,7 +29,7 @@ spring:
 
       # 🌐 RDS 연결 안정성 향상
       connection-test-query: SELECT 1
-      auto-commit: true
+      auto-commit: false
 
   jpa:
     show-sql: false                # 운영환경에서는 false
