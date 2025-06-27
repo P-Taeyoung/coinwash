@@ -34,7 +34,7 @@ spring:
   jpa:
     show-sql: false                # 운영환경에서는 false
     hibernate:
-      ddl-auto: validate           # 🚨 운영환경에서는 validate 사용!
+      ddl-auto: update           # 🚨 운영환경에서는 validate 사용!
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
