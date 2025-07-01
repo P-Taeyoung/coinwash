@@ -18,7 +18,7 @@ public class SearchLaundryService {
 	public List<LaundryResponseDto> findLaundriesNearBy(double longitude, double latitude, double distance) {
 
 		return laundryRepository.findLaundriesNearBy(longitude, latitude, distance)
-			.stream().map(LaundryResponseDto::from).collect(Collectors.toList());
+			.stream().map(laundry -> LaundryResponseDto.fromWithDistance(laundry, latitude, longitude)).collect(Collectors.toList());
 	}
 
 }
