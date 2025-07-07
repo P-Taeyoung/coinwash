@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>코인워시 - 기계 현황</title>
+  <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container">
+  <div class="page-header">
+    <h1>🔧 기계 현황</h1>
+    <p id="laundryInfo">세탁소 기계 현황을 확인하고 예약하세요</p>
+  </div>
+
+  <!-- 기계 현황 요약 -->
+  <div class="machine-summary">
+    <div class="summary-card washing">
+      <div class="summary-icon">🌀</div>
+      <div class="summary-info">
+        <h3 id="washingCount">0</h3>
+        <p>세탁기</p>
+      </div>
+    </div>
+
+    <div class="summary-card drying">
+      <div class="summary-icon">🔥</div>
+      <div class="summary-info">
+        <h3 id="dryingCount">0</h3>
+        <p>건조기</p>
+      </div>
+    </div>
+
+    <div class="summary-card available">
+      <div class="summary-icon">✅</div>
+      <div class="summary-info">
+        <h3 id="availableCount">0</h3>
+        <p>사용 가능</p>
+      </div>
+    </div>
+
+    <div class="summary-card in-use">
+      <div class="summary-icon">🔄</div>
+      <div class="summary-info">
+        <h3 id="inUseCount">0</h3>
+        <p>사용 중</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 기계 목록 -->
+  <div class="machines-section">
+    <div class="section-header">
+      <h2>🔧 기계 목록</h2>
+      <button id="refreshBtn" class="btn btn-outline">
+        🔄 새로고침
+      </button>
+    </div>
+
+    <div class="machines-grid" id="machinesGrid">
+      <!-- JavaScript로 동적 로딩 -->
+    </div>
+  </div>
+
+  <!-- 로딩 스피너 -->
+  <div id="loading" class="loading-spinner" style="display: none;">
+    <div class="spinner"></div>
+    <p>기계 정보를 불러오는 중...</p>
+  </div>
+</div>
+
+<!-- 기계 사용 모달 -->
+<div id="useMachineModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="useMachineTitle">🌀 세탁기 사용</h3>
+      <span class="close" id="closeUseMachineModal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div id="machineInfo" class="machine-info">
+        <!-- 기계 정보 표시 -->
+      </div>
+
+      <form id="useMachineForm">
+        <input type="hidden" id="useMachineId" name="machineId">
+        <input type="hidden" id="machineType" name="machineType">
+
+        <div class="form-group">
+          <label for="course">🎯 코스 선택</label>
+          <div id="courseOptions" class="course-options">
+            <!-- JavaScript로 동적 생성 -->
+          </div>
+        </div>
+
+        <div class="cost-summary">
+          <div class="cost-item">
+            <span>선택한 코스:</span>
+            <span id="selectedCourse">-</span>
+          </div>
+          <div class="cost-item">
+            <span>필요 포인트:</span>
+            <span id="requiredPoints">0</span>원
+          </div>
+          <div class="cost-item">
+            <span>보유 포인트:</span>
+            <span id="userPoints">0</span>원
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary btn-full">
+            ✨ 사용 시작
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 예약 모달 -->
+<div id="reserveMachineModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>📅 기계 예약</h3>
+      <span class="close" id="closeReserveMachineModal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div id="reserveMachineInfo" class="machine-info">
+        <!-- 기계 정보 표시 -->
+      </div>
+
+      <div class="reservation-notice">
+        <div class="notice-icon">⚠️</div>
+        <div class="notice-content">
+          <h4>예약 안내</h4>
+          <ul>
+            <li>예약 후 15분 내에 사용해야 합니다</li>
+            <li>15분 내 미사용 시 자동 취소됩니다</li>
+            <li>예약 취소 시 포인트의 50%만 환불됩니다</li>
+          </ul>
+        </div>
+      </div>
+
+      <form id="reserveMachineForm">
+        <input type="hidden" id="reserveMachineId" name="machineId">
+
+        <div class="cost-summary">
+          <div class="cost-item">
+            <span>예약 포인트:</span>
+            <span id="reservationPoints">100</span>원
+          </div>
+          <div class="cost-item">
+            <span>보유 포인트:</span>
+            <span id="userPointsReserve">0</span>원
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary btn-full">
+            📅 예약하기
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script th:src="@{/js/customer-machines.js}"></script>
+</body>
+</html>

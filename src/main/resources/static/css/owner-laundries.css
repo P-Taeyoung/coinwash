@@ -1,0 +1,266 @@
+/* 🎨 세탁소 카드 스타일 */
+.laundry-card {
+    background: #ffffff;
+    border: 1px solid #e1e5e9;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.laundry-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+/* 카드 헤더 */
+.laundry-card-header {
+    padding: 20px 24px 16px 24px;
+    border-bottom: 1px solid #f0f2f5;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.laundry-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.laundry-name {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.laundry-icon {
+    font-size: 20px;
+}
+
+/* 상태 배지 */
+.laundry-status-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-open {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-closed {
+    background: linear-gradient(135deg, #f8d7da, #f1b0b7);
+    color: #721c24;
+    border: 1px solid #f1b0b7;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-open .status-dot {
+    background: #28a745;
+    box-shadow: 0 0 6px rgba(40, 167, 69, 0.6);
+}
+
+.status-closed .status-dot {
+    background: #dc3545;
+    box-shadow: 0 0 6px rgba(220, 53, 69, 0.6);
+}
+
+/* 카드 바디 */
+.laundry-card-body {
+    padding: 20px 24px;
+}
+
+.laundry-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.laundry-info-item:last-child {
+    margin-bottom: 0;
+}
+
+.info-icon {
+    font-size: 16px;
+    width: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.info-text {
+    color: #495057;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+/* 카드 푸터 */
+.laundry-card-footer {
+    padding: 16px 24px 20px 24px;
+    background: #fafbfc;
+    border-top: 1px solid #f0f2f5;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* 버튼 스타일 개선 */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-icon {
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d, #545b62);
+    color: white;
+    box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #545b62, #3d4449);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #1e7e34, #155724);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+    color: #212529;
+    box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #e0a800, #d39e00);
+    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.4);
+    transform: translateY(-1px);
+}
+
+/* 빈 상태 스타일 개선 */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: #ffffff;
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    color: #495057;
+    margin-bottom: 8px;
+    font-size: 20px;
+}
+
+.empty-state p {
+    color: #6c757d;
+    margin-bottom: 24px;
+    font-size: 14px;
+}
+
+.error-state {
+    border-color: #dc3545;
+    background: #fff5f5;
+}
+
+.error-state .empty-icon {
+    filter: hue-rotate(0deg);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .laundry-card-header,
+    .laundry-card-body,
+    .laundry-card-footer {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .laundry-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .action-buttons {
+        justify-content: center;
+    }
+
+    .btn {
+        flex: 1;
+        justify-content: center;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}

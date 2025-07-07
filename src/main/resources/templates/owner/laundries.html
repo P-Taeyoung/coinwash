@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>코인워시 - 세탁소 관리</title>
+  <link th:href="@{/css/style.css}" rel="stylesheet">
+  <link th:href="@{/css/address-search.css}" rel="stylesheet">
+  <link th:href="@{/css/owner-laundries.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container">
+  <div class="page-header">
+    <h1>🏪 세탁소 관리</h1>
+    <p>내 세탁소를 등록하고 관리하세요</p>
+  </div>
+
+  <!-- 관리 도구 -->
+  <div class="management-tools">
+    <button id="addLaundryBtn" class="btn btn-primary">
+      ➕ 세탁소 등록
+    </button>
+    <button id="refreshBtn" class="btn btn-outline">
+      🔄 새로고침
+    </button>
+  </div>
+
+  <!-- 세탁소 목록 -->
+  <div class="laundries-section">
+    <div class="section-header">
+      <h2>📊 내 세탁소 목록</h2>
+      <div class="laundry-stats">
+        <span>총 <span id="totalCount">0</span>개</span>
+      </div>
+    </div>
+
+    <div id="laundriesList" class="owner-laundries-list">
+      <!-- JavaScript로 동적 로딩 -->
+    </div>
+
+    <!-- 페이지네이션 -->
+    <div id="pagination" class="pagination">
+      <!-- JavaScript로 동적 생성 -->
+    </div>
+  </div>
+
+  <!-- 로딩 스피너 -->
+  <div id="loading" class="loading-spinner" style="display: none;">
+    <div class="spinner"></div>
+    <p>세탁소 정보를 불러오는 중...</p>
+  </div>
+</div>
+
+<!-- 세탁소 등록/수정 모달 -->
+<div id="laundryModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalTitle">➕ 세탁소 등록</h3>
+      <span class="close" id="closeLaundryModal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="laundryForm">
+        <input type="hidden" id="laundryId" name="laundryId">
+
+        <!-- ✅ 주소 검색 섹션 (등록시에만 표시) -->
+        <div id="addressSearchSection">
+          <div class="form-group">
+            <label for="addressSearch">📍 주소 검색</label>
+            <div class="address-search-group">
+              <input type="text" id="addressSearch" placeholder="주소를 검색하세요" class="form-control">
+              <button type="button" id="searchAddressBtn" class="btn btn-outline">🔍 검색</button>
+            </div>
+          </div>
+
+          <div id="addressResults" class="address-results" style="display: none;">
+            <h4>검색 결과</h4>
+            <div id="addressList" class="address-list">
+              <!-- JavaScript로 동적 생성 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ 선택된 주소 섹션 (등록시에만 표시) -->
+        <div id="selectedAddressSection">
+          <!-- 선택된 주소 표시 (customer와 동일한 구조) -->
+          <div id="selectedAddress" class="selected-address" style="display: none;">
+            <div class="selected-header">
+              <span>✅ 선택된 주소</span>
+              <button type="button" id="clearSelected" class="clear-results-btn" onclick="clearSelectedAddress()">✕</button>
+            </div>
+            <div class="selected-content">
+              <div class="address-name" id="selectedAddressName"></div>
+              <div class="address-coords" id="selectedAddressCoords"></div>
+            </div>
+          </div>
+
+          <!-- 폼 전송용 숨겨진 필드들 -->
+          <input type="hidden" id="addressName" name="addressName">
+          <input type="hidden" id="latitude" name="latitude">
+          <input type="hidden" id="longitude" name="longitude">
+        </div>
+
+        <div class="form-group">
+          <label for="description">🏷️ 세탁소 설명</label>
+          <textarea id="description" name="description"
+                    placeholder="세탁소에 대한 간단한 설명을 입력하세요"
+                    class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">
+            ✨ 저장
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 상태 변경 모달 -->
+<div id="statusModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>🔧 운영 상태 변경</h3>
+      <span class="close" id="closeStatusModal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <p id="statusChangeMessage"></p>
+      <div class="status-options">
+        <div class="status-option">
+          <div class="status-icon">✅</div>
+          <div class="status-info">
+            <h4>정상 영업</h4>
+            <p>고객이 세탁소를 이용할 수 있습니다</p>
+          </div>
+        </div>
+        <div class="status-option">
+          <div class="status-icon">❌</div>
+          <div class="status-info">
+            <h4>영업 중단</h4>
+            <p>임시적으로 영업을 중단합니다</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="confirmStatusChange" class="btn btn-primary">
+          ✅ 변경
+        </button>
+        <button id="cancelStatusChange" class="btn btn-secondary">
+          ❌ 취소
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script th:src="@{/js/address-search-utils.js}"></script>
+<script th:src="@{/js/owner-laundries.js}"></script>
+</body>
+</html>

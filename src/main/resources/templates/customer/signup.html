@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>코인워시 - 고객 회원가입</title>
+  <link th:href="@{/css/style.css}" rel="stylesheet">
+  <!-- ✅ 주소 검색 CSS 추가 -->
+  <link th:href="@{/css/address-search.css}" rel="stylesheet">
+</head>
+<body class="auth-body">
+<div class="auth-container">
+  <div class="auth-header">
+    <h1>👤 고객 회원가입</h1>
+    <p>코인워시 서비스를 이용하기 위해 회원가입하세요</p>
+  </div>
+
+  <!-- 회원가입 폼 -->
+  <form id="customerSignupForm" class="auth-form">
+    <div class="form-group">
+      <label for="id">🆔 아이디</label>
+      <input type="text" id="id" name="id"
+             placeholder="아이디를 입력하세요" class="form-control" required>
+      <small class="form-text">영문, 숫자 조합 4-20자</small>
+    </div>
+
+    <div class="form-group">
+      <label for="password">🔒 비밀번호</label>
+      <input type="password" id="password" name="password"
+             placeholder="비밀번호를 입력하세요" class="form-control" required>
+      <small class="form-text">영문, 숫자, 특수문자 조합 8자 이상</small>
+    </div>
+
+    <div class="form-group">
+      <label for="confirmPassword">🔒 비밀번호 확인</label>
+      <input type="password" id="confirmPassword" name="confirmPassword"
+             placeholder="비밀번호를 다시 입력하세요" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+      <label for="name">👤 이름</label>
+      <input type="text" id="name" name="name"
+             placeholder="이름을 입력하세요" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+      <label for="phone">📱 전화번호</label>
+      <input type="tel" id="phone" name="phone"
+             placeholder="010-1234-5678" class="form-control" required>
+    </div>
+
+    <!-- ✅ 주소 검색 컴포넌트 (address-search-utils.js 활용) -->
+    <div class="form-group">
+      <label for="addressSearch">📍 주소 검색</label>
+      <div class="address-search-container">
+        <div class="search-input-group">
+          <input type="text" id="addressSearch" placeholder="주소를 입력하세요 (실시간 검색)" class="form-control">
+          <span class="search-feedback" id="searchFeedback"></span>
+          <button type="button" id="searchAddressBtn" class="search-btn">🔍 주소 검색</button>
+        </div>
+
+        <!-- 주소 검색 결과 -->
+        <div id="addressResults" class="address-results" style="display: none;">
+          <div class="results-header">
+            <span>📍 주소 검색 결과</span>
+            <button type="button" class="clear-results-btn" onclick="hideAddressResults()">✕</button>
+          </div>
+          <ul id="addressList" class="address-list">
+            <!-- JavaScript로 동적 로딩 -->
+          </ul>
+        </div>
+
+        <!-- 선택된 주소 표시 -->
+        <div id="selectedAddress" class="selected-address" style="display: none;">
+          <div class="selected-header">
+            <span>✅ 선택된 주소</span>
+            <button type="button" id="clearSelected" class="clear-results-btn" onclick="clearSelectedAddress()">✕</button>
+          </div>
+          <div class="selected-content">
+            <div class="address-name" id="selectedAddressName"></div>
+            <div class="address-coords" id="selectedAddressCoords"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ 폼 전송용 숨겨진 필드들 -->
+    <input type="hidden" id="addressName" name="address">
+    <input type="hidden" id="latitude" name="latitude">
+    <input type="hidden" id="longitude" name="longitude">
+
+    <button type="submit" class="btn btn-primary btn-full">
+      ✨ 회원가입
+    </button>
+  </form>
+
+  <!-- 로그인 링크 -->
+  <div class="auth-links">
+    <p>이미 회원이신가요?</p>
+    <a th:href="@{/auth/signin}" class="link-primary">
+      🚪 로그인하기
+    </a>
+  </div>
+
+  <!-- 홈으로 돌아가기 -->
+  <div class="auth-footer">
+    <a th:href="@{/}" class="link-secondary">
+      🏠 홈으로 돌아가기
+    </a>
+  </div>
+</div>
+
+<!-- ✅ 순서 중요: 유틸리티 먼저, 메인 스크립트 나중에 -->
+<script th:src="@{/js/address-search-utils.js}"></script>
+<script th:src="@{/js/customer-signup.js}"></script>
+</body>
+</html>

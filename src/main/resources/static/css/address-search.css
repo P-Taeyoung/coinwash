@@ -1,0 +1,486 @@
+/* 주소 검색 공통 컴포넌트 스타일 */
+
+/* 기본 스크롤바 제거 및 레이아웃 수정 */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    overflow-x: hidden; /* 가로 스크롤바 완전 제거 */
+    max-width: 100vw;
+}
+
+/* 주소 검색 컨테이너 */
+.address-search-container {
+    position: relative;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* 검색 입력 그룹 */
+.search-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+}
+
+.search-input-group .form-control {
+    flex: 1;
+    padding: 15px 20px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+}
+
+.search-input-group .form-control:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-btn {
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.search-btn:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 검색 결과 */
+.address-results {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    margin-top: 10px;
+    max-height: 400px;
+    overflow: hidden;
+    animation: slideDown 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-weight: 600;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.clear-results-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.clear-results-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.address-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+    overflow-y: auto;
+    max-height: 280px;
+    width: 100%;
+    max-width: 100%;
+}
+
+.address-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.address-item:hover {
+    background: #e3f2fd;
+    transform: translateX(5px);
+}
+
+.address-item:last-child {
+    border-bottom: none;
+}
+
+.address-item.selected {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border-left: 4px solid #667eea;
+}
+
+.address-item.no-results {
+    text-align: center;
+    padding: 30px;
+    color: #7f8c8d;
+    cursor: default;
+}
+
+.address-item.no-results:hover {
+    background: transparent;
+    transform: none;
+}
+
+.address-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 5px;
+    font-size: 16px;
+    line-height: 1.4;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.address-coords {
+    font-size: 14px;
+    color: #7f8c8d;
+    line-height: 1.3;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 선택된 주소 표시 */
+.selected-address {
+    background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+    border: 2px solid #4caf50;
+    border-radius: 12px;
+    margin-top: 15px;
+    animation: slideDown 0.3s ease;
+    box-shadow: 0 3px 10px rgba(76, 175, 80, 0.2);
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.selected-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #4caf50, #388e3c);
+    color: white;
+    font-weight: 600;
+    border-radius: 10px 10px 0 0;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.selected-header .clear-results-btn {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.selected-content {
+    padding: 20px;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.selected-content .address-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2e7d32;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.selected-content .address-coords {
+    font-size: 14px;
+    color: #558b2f;
+    line-height: 1.3;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.selected-content .address-coords:empty {
+    display: none;
+}
+
+/* 로딩 상태 */
+.search-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    color: #667eea;
+    text-align: center;
+    width: 100%;
+    max-width: 100%;
+}
+
+.search-loading::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 페이지네이션 */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-top: 1px solid #dee2e6;
+    border-radius: 0 0 12px 12px;
+    margin-top: auto;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.page-btn {
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    min-width: 60px;
+    flex-shrink: 0;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #5a67d8, #6b46c1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.page-btn:disabled {
+    background: linear-gradient(135deg, #bdc3c7, #95a5a6);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.6;
+}
+
+.page-info {
+    font-weight: 700;
+    color: #495057;
+    font-size: 15px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+/* 검색 로딩 스타일 */
+.search-loading {
+    text-align: center;
+    padding: 20px;
+    color: #667eea;
+    font-style: italic;
+    width: 100%;
+    max-width: 100%;
+}
+
+.error-item {
+    background-color: #fee;
+    border-left: 4px solid #e74c3c;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* 스크롤바 스타일링 */
+.address-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.address-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.address-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 4px;
+}
+
+.address-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a67d8, #6b46c1);
+}
+
+/* 실시간 검색 관련 스타일 추가 */
+
+/* 검색 입력창 실시간 검색 표시 */
+.search-input-group .form-control.searching {
+    border-color: #667eea;
+    background: linear-gradient(90deg, #f8f9fa 0%, #e3f2fd 50%, #f8f9fa 100%);
+    background-size: 200% 100%;
+    animation: searchingAnimation 1.5s ease-in-out infinite;
+}
+
+@keyframes searchingAnimation {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* 실시간 검색 피드백 */
+.search-feedback {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #667eea;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+/* 모든 컨테이너 요소들의 가로 스크롤 방지 */
+.container, .main-content {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .search-input-group {
+        flex-direction: column;
+    }
+
+    .search-btn {
+        width: 100%;
+    }
+
+    .pagination-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .address-item {
+        padding: 12px 15px;
+    }
+
+    .selected-content {
+        padding: 15px;
+    }
+
+    .results-header {
+        padding: 12px 15px;
+    }
+
+    .page-info {
+        max-width: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-input-group .form-control {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+
+    .search-btn {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+
+    .address-name {
+        font-size: 15px;
+    }
+
+    .address-coords {
+        font-size: 13px;
+    }
+
+    .page-info {
+        max-width: 80px;
+        font-size: 14px;
+    }
+}

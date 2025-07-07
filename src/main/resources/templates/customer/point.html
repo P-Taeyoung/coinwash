@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>코인워시 - 포인트 관리</title>
+  <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container">
+  <div class="page-header">
+    <h1>💰 포인트 관리</h1>
+    <p>포인트를 충전하고 사용 내역을 확인하세요</p>
+  </div>
+
+  <!-- 포인트 현황 -->
+  <div class="point-summary">
+    <div class="point-card">
+      <div class="point-icon">💎</div>
+      <div class="point-info">
+        <h2>현재 보유 포인트</h2>
+        <p class="point-amount" id="currentPoints">0원</p>
+      </div>
+      <button id="refreshPointsBtn" class="btn btn-outline">🔄</button>
+    </div>
+  </div>
+
+  <!-- 포인트 충전 -->
+  <div class="point-section">
+    <div class="section-header">
+      <h2>⚡ 포인트 충전</h2>
+    </div>
+
+    <div class="charge-options">
+      <div class="charge-grid">
+        <button class="charge-btn" data-amount="1000">
+          <span class="amount">1,000원</span>
+        </button>
+        <button class="charge-btn" data-amount="3000">
+          <span class="amount">3,000원</span>
+        </button>
+        <button class="charge-btn" data-amount="5000">
+          <span class="amount">5,000원</span>
+        </button>
+        <button class="charge-btn" data-amount="10000">
+          <span class="amount">10,000원</span>
+        </button>
+        <button class="charge-btn" data-amount="20000">
+          <span class="amount">20,000원</span>
+        </button>
+        <button class="charge-btn" data-amount="50000">
+          <span class="amount">50,000원</span>
+        </button>
+      </div>
+
+      <div class="custom-charge">
+        <h3>💡 직접 입력</h3>
+        <div class="custom-input-group">
+          <input type="number" id="customAmount" placeholder="충전할 금액 입력"
+                 min="1000" step="1000" class="form-control">
+          <button id="customChargeBtn" class="btn btn-primary">충전</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 포인트 사용 내역 -->
+  <div class="point-section">
+    <div class="section-header">
+      <h2>📊 포인트 내역</h2>
+    </div>
+
+    <div id="pointHistory" class="point-history">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>날짜</th>
+            <th>구분</th>
+            <th>포인트</th>
+          </tr>
+          </thead>
+          <tbody>
+          <!-- JavaScript로 동적 로딩 -->
+          <tr>
+            <td colspan="3" class="text-center">포인트 내역을 불러오는 중...</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 페이지네이션 -->
+    <div id="pointPagination" class="pagination">
+      <!-- JavaScript로 동적 생성 -->
+    </div>
+  </div>
+
+  <!-- 로딩 스피너 -->
+  <div id="loading" class="loading-spinner" style="display: none;">
+    <div class="spinner"></div>
+    <p>포인트 정보를 불러오는 중...</p>
+  </div>
+</div>
+
+<!-- 충전 확인 모달 -->
+<div id="chargeModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>💳 포인트 충전</h3>
+      <span class="close" id="closeChargeModal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="charge-summary">
+        <p><strong>충전 금액: <span id="chargeAmount">0</span>원</strong></p>
+      </div>
+
+      <div class="charge-notice">
+        <div class="notice-icon">💡</div>
+        <div class="notice-content">
+          <p>포인트 충전 후 기계 사용 및 예약에 사용할 수 있습니다.</p>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="confirmCharge" class="btn btn-primary btn-full">
+          ✨충전하기
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script th:src="@{/js/customer-point.js}"></script>
+</body>
+</html>
