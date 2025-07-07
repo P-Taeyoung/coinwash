@@ -19,7 +19,7 @@ public class ViewController {
 
 	@GetMapping("/customer/signup")
 	public String customerSignup() {
-		return "/customer/signup";
+		return "customer/signup";
 	}
 
 	@GetMapping("/customer/point")
