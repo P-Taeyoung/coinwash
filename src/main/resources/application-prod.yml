@@ -2,6 +2,20 @@ spring:
   application:
     name: coinwash
 
+
+  # Thymeleaf 기본 설정
+  thymeleaf:
+    cache: true  # 개발용 - 템플릿 변경시 즉시 반영
+    encoding: UTF-8
+    mode: HTML
+    prefix: classpath:/templates/
+    suffix: .html
+
+  # 정적 리소스 설정
+  web:
+    resources:
+      static-locations: classpath:/static/
+
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
