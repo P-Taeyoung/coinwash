@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>코인워시 - 로그인</title>
+  <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body class="auth-body">
+<div class="auth-container">
+  <div class="auth-header">
+    <h1>🧺 코인워시</h1>
+    <p>로그인하여 서비스를 이용하세요</p>
+  </div>
+
+  <!-- 사용자 유형 선택 -->
+  <div class="user-type-selector">
+    <button class="user-type-btn active" data-type="customer">
+      👤 고객 로그인
+    </button>
+    <button class="user-type-btn" data-type="owner">
+      🏪 점주 로그인
+    </button>
+  </div>
+
+  <!-- 로그인 폼 -->
+  <form id="signinForm" class="auth-form">
+    <div class="form-group">
+      <label for="signInId">🆔 아이디</label>
+      <input type="text" id="signInId" name="signInId"
+             placeholder="아이디를 입력하세요" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+      <label for="password">🔒 비밀번호</label>
+      <input type="password" id="password" name="password"
+             placeholder="비밀번호를 입력하세요" class="form-control" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-full">
+      🚪 로그인
+    </button>
+  </form>
+
+  <!-- 회원가입 링크 -->
+  <div class="auth-links">
+    <p>아직 회원이 아니신가요?</p>
+    <div class="signup-links">
+      <a th:href="@{/customer/signup}" id="customerSignupLink" class="link-primary">
+        👤 고객 회원가입
+      </a>
+      <a th:href="@{/owner/signup}" id="ownerSignupLink" class="link-secondary" style="display: none;">
+        🏪 점주 회원가입
+      </a>
+    </div>
+  </div>
+
+  <!-- 홈으로 돌아가기 -->
+  <div class="auth-footer">
+    <a th:href="@{/}" class="link-secondary">
+      🏠 홈으로 돌아가기
+    </a>
+  </div>
+</div>
+
+<script th:src="@{/js/auth-signin.js}"></script>
+</body>
+</html>

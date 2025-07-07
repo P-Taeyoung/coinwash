@@ -20,6 +20,7 @@ import pp.coinwash.machine.domain.dto.MachineResponseDto;
 import pp.coinwash.machine.domain.dto.MachineUpdateDto;
 import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.domain.repository.MachineRepository;
+import pp.coinwash.machine.domain.type.UsageStatus;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +47,8 @@ public class MachineManageService {
 
 		for (Machine machine : machines) {
 			if (machine.getEndTime() != null
-			&& machine.getEndTime().isBefore(LocalDateTime.now())) {
+			&& machine.getEndTime().isBefore(LocalDateTime.now())
+			&& machine.getUsageStatus() != UsageStatus.UNUSABLE) {
 
 				machine.reset();
 			}

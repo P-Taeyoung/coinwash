@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>코인워시 - 주변 세탁소</title>
+  <link th:href="@{/css/style.css}" rel="stylesheet">
+  <link th:href="@{/css/address-search.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container">
+  <div class="page-header">
+    <h1>🔍 주변 세탁소</h1>
+    <p>내 주변 세탁소를 찾아 이용해보세요</p>
+  </div>
+
+  <!-- 위치 설정 및 검색 -->
+  <div class="location-section">
+    <!-- 주소 검색 컴포넌트 -->
+    <div class="address-search-container">
+      <div class="search-input-group">
+        <input type="text" id="addressSearch" placeholder="주소를 입력하세요 (실시간 검색)" class="form-control">
+        <span class="search-feedback" id="searchFeedback"></span>
+        <button id="searchAddressBtn" class="search-btn">🔍 주소 검색</button>
+        <button id="getCurrentLocationBtn" class="btn btn-outline">📍 현재 위치</button>
+      </div>
+
+      <!-- 나머지는 동일 -->
+      <!-- 주소 검색 결과 -->
+      <div id="addressResults" class="address-results" style="display: none;">
+        <div class="results-header">
+          <span>📍 주소 검색 결과</span>
+          <button type="button" class="clear-results-btn" onclick="hideAddressResults()">✕</button>
+        </div>
+        <ul id="addressList" class="address-list">
+          <!-- JavaScript로 동적 로딩 -->
+        </ul>
+      </div>
+
+      <!-- 선택된 주소 표시 -->
+      <div id="selectedAddress" class="selected-address" style="display: none;">
+        <div class="selected-header">
+          <span>✅ 선택된 주소</span>
+          <button type="button" id="clearSelected" class="clear-results-btn" onclick="clearSelectedAddress()">✕</button>
+        </div>
+        <div class="selected-content">
+          <div class="address-name" id="selectedAddressName"></div>
+          <div class="address-coords" id="selectedAddressCoords"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="distance-selector">
+      <label>검색 거리:</label>
+      <select id="distanceSelect" class="form-control">
+        <option value="0.5">500m</option>
+        <option value="1.0">1km</option>
+        <option value="2.0">2km</option>
+        <option value="5.0">5km</option>
+      </select>
+      <button id="searchLaundriesBtn" class="btn btn-primary">🔍 세탁소 검색</button>
+    </div>
+  </div>
+
+  <!-- 세탁소 목록 -->
+  <div class="laundries-section">
+    <div class="section-header">
+      <h2 id="laundriesTitle">🏪 주변 세탁소</h2>
+    </div>
+
+    <div id="laundriesList" class="laundries-list">
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3>위치를 설정해주세요</h3>
+        <p>주소를 검색하거나 현재 위치를 사용하여 주변 세탁소를 찾아보세요</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 로딩 스피너 -->
+  <div id="loading" class="loading-spinner" style="display: none;">
+    <div class="spinner"></div>
+    <p>세탁소를 검색하는 중...</p>
+  </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- 순서 중요: 유틸리티 먼저, 메인 스크립트 나중에 -->
+<script th:src="@{/js/address-search-utils.js}"></script>
+<script th:src="@{/js/customer-laundries.js}"></script>
+</body>
+</html>

@@ -2,6 +2,9 @@ package pp.coinwash.laundry.service;
 
 import static pp.coinwash.common.exception.ErrorCode.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +32,9 @@ public class LaundryManageService {
 		laundryRepository.save(Laundry.of(dto, ownerId));
 	}
 
-	public PagedResponseDto<LaundryResponseDto> getLaundriesByOwnerId(long ownerId, Pageable pageable) {
-		return PagedResponseDto.from(laundryRepository.findByOwnerIdAndDeletedAtIsNull(ownerId, pageable).map(LaundryResponseDto::from));
+	public List<LaundryResponseDto> getLaundriesByOwnerId(long ownerId) {
+		return laundryRepository.findByOwnerIdAndDeletedAtIsNull(ownerId).stream().map(LaundryResponseDto::from).collect(
+			Collectors.toList());
 	}
 
 	@Transactional

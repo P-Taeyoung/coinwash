@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+<footer th:fragment="footer" class="footer">
+  <div class="footer-container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>🧺 코인워시</h3>
+        <p>편리한 무인 빨래방 서비스</p>
+        <div class="footer-links">
+          <a th:href="@{/about}">서비스 소개</a>
+          <a th:href="@{/terms}">이용약관</a>
+          <a th:href="@{/privacy}">개인정보처리방침</a>
+        </div>
+      </div>
+
+      <div class="footer-section">
+        <h4>📞 고객센터</h4>
+        <p>전화: 1588-0000</p>
+        <p>이메일: support@coinwash.com</p>
+        <p>운영시간: 평일 09:00 - 18:00</p>
+      </div>
+
+      <div class="footer-section">
+        <h4>🏪 사업자 정보</h4>
+        <p>회사명: 코인워시 주식회사</p>
+        <p>대표: 홍길동</p>
+        <p>사업자등록번호: 123-45-67890</p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2024 코인워시. All rights reserved.</p>
+      <div class="footer-social">
+        <a href="#" class="social-link">📘</a>
+        <a href="#" class="social-link">📷</a>
+        <a href="#" class="social-link">🐦</a>
+      </div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

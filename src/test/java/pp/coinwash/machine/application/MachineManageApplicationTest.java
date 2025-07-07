@@ -36,8 +36,7 @@ class MachineManageApplicationTest {
 	@InjectMocks
 	MachineManageApplication application;
 
-	private MachineResponseDto responseDto;
-	private MachineRedisDto redisDto;
+
 	private MachineRegisterDto registerDto;
 	private Machine machine;
 	private MachineUpdateDto updateDto;
@@ -45,18 +44,6 @@ class MachineManageApplicationTest {
 
 	@BeforeEach
 	void setUp() {
-		responseDto = MachineResponseDto.builder()
-			.machineId(1L)
-			.machineType(MachineType.WASHING)
-			.usageStatus(UsageStatus.USABLE)
-			.build();
-
-		redisDto  = MachineRedisDto.builder()
-			.machineId(1L)
-			.laundryId(1L)
-			.usageStatus(UsageStatus.USABLE)
-			.build();
-
 		registerDto = MachineRegisterDto.builder()
 			.machineType(MachineType.WASHING)
 			.build();
@@ -71,39 +58,6 @@ class MachineManageApplicationTest {
 			.machineId(1L)
 			.usageStatus(UsageStatus.UNUSABLE)
 			.build();
-	}
-
-	@Test
-	@DisplayName("레디스에 데이터가 있는 경우")
-	void testGetMachinesByLaundryId_RedisHasData() {
-		// Given
-		long laundryId = 1L;
-		List<MachineRedisDto> redisData = List.of(redisDto);
-		when(redisService.getMachinesByLaundryId(laundryId)).thenReturn(redisData);
-
-		// When
-		List<MachineResponseDto> result = application.getMachinesByLaundryId(laundryId);
-
-		// Then
-		assertEquals(1, result.size());
-		verify(manageService, never()).getMachinesByLaundryId(anyLong()); // DB 호출 안 됨
-	}
-
-	@Test
-	@DisplayName("레디스 에러가 발생한 경우")
-	void testGetMachinesByLaundryId_RedisThrowsException() {
-		// Given
-		long laundryId = 1L;
-		when(redisService.getMachinesByLaundryId(laundryId)).thenThrow(new RedisException("레디스 오류"));
-		List<MachineResponseDto> dbData = List.of(responseDto);
-		when(manageService.getMachinesByLaundryId(laundryId)).thenReturn(dbData);
-
-		// When
-		List<MachineResponseDto> result = application.getMachinesByLaundryId(laundryId);
-
-		// Then
-		assertEquals(1, result.size());
-		verify(manageService).getMachinesByLaundryId(laundryId); // DB 호출 확인
 	}
 
 	@Test

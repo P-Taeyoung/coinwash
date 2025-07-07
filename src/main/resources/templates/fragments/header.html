@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+<header th:fragment="header" class="header">
+  <nav class="navbar">
+    <div class="nav-container">
+      <!-- 로고 -->
+      <a th:href="@{/}" class="nav-logo">
+        🧺 코인워시
+      </a>
+
+      <!-- 네비게이션 메뉴 (JavaScript로 동적 생성) -->
+      <div class="nav-menu" id="navMenu">
+        <!-- JavaScript로 채워짐 -->
+      </div>
+
+      <!-- 모바일 메뉴 버튼 -->
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        ☰
+      </button>
+    </div>
+  </nav>
+
+  <!-- 모바일 메뉴 -->
+  <div class="mobile-menu" id="mobileMenu">
+    <!-- JavaScript로 채워짐 -->
+  </div>
+
+  <!-- 🔔 알림 드롭다운 외부 클릭 감지용 오버레이 -->
+  <div class="notification-overlay" id="notificationOverlay"></div>
+
+  <script th:src="@{/js/notification.js}"></script>
+  <script th:src="@{/js/header.js}"></script>
+</header>
+</body>
+</html>

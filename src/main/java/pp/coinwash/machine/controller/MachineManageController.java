@@ -24,7 +24,7 @@ import pp.coinwash.security.dto.CustomUserDetails;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/machines")
+@RequestMapping("/api/owner/machines")
 @Tag(name = "기계 관리", description = "기계 관리 API")
 public class MachineManageController {
 
@@ -46,17 +46,7 @@ public class MachineManageController {
 		return ResponseEntity.ok("기계정보가 정상적으로 저장되었습니다.");
 	}
 
-	@Operation(
-		summary = "기계 정보 조회",
-		tags = {"기계 관리"},
-		description = "특정 세탁소의 기계 정보 목록을 조회할 수 있도록 함."
-	)
-	@GetMapping
-	public ResponseEntity<List<MachineResponseDto>> getMachines(
-		@RequestParam long laundryId) {
 
-		return ResponseEntity.ok(machineManageApplication.getMachinesByLaundryId(laundryId));
-	}
 
 	@Operation(
 		summary = "기계 정보 수정",

@@ -1,0 +1,343 @@
+/* 점주 전용 스타일 */
+
+/* 세탁소 관리 페이지 */
+.owner-laundry-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.owner-laundry-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+/* 기계 관리 페이지 */
+.laundry-selector {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.laundry-selector h3 {
+    margin: 0 0 1rem 0;
+    color: #333;
+}
+
+.laundry-selector select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.management-tools {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.tools-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.tools-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.status-filter select {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.machine-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    border-left: 4px solid #ddd;
+}
+
+.summary-card.washing {
+    border-left-color: #007bff;
+}
+
+.summary-card.drying {
+    border-left-color: #fd7e14;
+}
+
+.summary-card.available {
+    border-left-color: #28a745;
+}
+
+.summary-card.in-use {
+    border-left-color: #ffc107;
+}
+
+.summary-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.summary-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.owner-machine-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    border-left: 4px solid #ddd;
+}
+
+.owner-machine-card.usable {
+    border-left-color: #28a745;
+}
+
+.owner-machine-card.using {
+    border-left-color: #ffc107;
+}
+
+.owner-machine-card.reserving {
+    border-left-color: #17a2b8;
+}
+
+.owner-machine-card.unusable {
+    border-left-color: #dc3545;
+}
+
+/* 모달 스타일 개선 */
+.modal-content {
+    max-width: 500px;
+    width: 90%;
+}
+
+.form-section {
+    margin-bottom: 1.5rem;
+}
+
+.form-section h4 {
+    margin: 0 0 1rem 0;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.address-search-container {
+    margin-bottom: 1rem;
+}
+
+.selected-address-display {
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+    margin-top: 0.5rem;
+}
+
+.selected-address-display.empty {
+    color: #666;
+    font-style: italic;
+}
+
+/* 기계 타입 선택 */
+.machine-type-options {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.machine-type-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.machine-type-option:hover {
+    border-color: #007bff;
+    background: #f8f9fa;
+}
+
+.machine-type-option input[type="radio"]:checked + .machine-type-info {
+    color: #007bff;
+}
+
+.machine-type-option input[type="radio"] {
+    margin-right: 0.75rem;
+}
+
+.machine-type-info {
+    text-align: center;
+    flex: 1;
+}
+
+.machine-type-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.machine-type-desc {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* 상태 표시 개선 */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    gap: 0.25rem;
+}
+
+.status-badge.open {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.closed {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-badge.available {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.in-use {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.reserved {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-badge.unavailable {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* 액션 버튼 그룹 */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.action-buttons .btn {
+    flex: 1;
+    min-width: 120px;
+}
+
+/* 통계 카드 */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.stat-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .tools-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .tools-actions {
+        justify-content: space-between;
+    }
+
+    .machine-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .machine-type-options {
+        flex-direction: column;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons .btn {
+        min-width: auto;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .machine-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-number {
+        font-size: 1.5rem;
+    }
+}

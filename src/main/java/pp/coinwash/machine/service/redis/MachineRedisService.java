@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import pp.coinwash.machine.domain.dto.MachineRedisDto;
 import pp.coinwash.machine.domain.entity.Machine;
 import pp.coinwash.machine.domain.repository.MachineRepository;
+import pp.coinwash.machine.domain.type.UsageStatus;
 
 @Component
 @Slf4j
@@ -84,7 +85,8 @@ public class MachineRedisService {
 			if (machine != null) {
 
 				if (machine.getEndTime() != null
-					&& machine.getEndTime().isBefore(LocalDateTime.now())) {
+					&& machine.getEndTime().isBefore(LocalDateTime.now())
+					&& machine.getUsageStatus() != UsageStatus.UNUSABLE) {
 
 					machine.reset();
 				}

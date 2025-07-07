@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>코인워시 - 기계 관리</title>
+  <link th:href="@{/css/style.css}" rel="stylesheet">
+  <link th:href="@{/css/modal.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container">
+  <div class="page-header">
+    <h1>🔧 기계 관리</h1>
+    <p>세탁소의 기계를 등록하고 관리하세요</p>
+  </div>
+
+  <!-- 세탁소 선택 -->
+  <div class="laundry-selector">
+    <div class="form-group">
+      <label for="laundrySelect">🏪 세탁소 선택</label>
+      <select id="laundrySelect" class="form-control">
+        <option value="">세탁소를 선택하세요</option>
+        <!-- JavaScript로 동적 로딩 -->
+      </select>
+    </div>
+  </div>
+
+  <!-- 관리 도구 -->
+  <div class="management-tools" id="managementTools" style="display: none;">
+    <button id="addMachineBtn" class="btn btn-primary">
+      ➕ 기계 등록
+    </button>
+    <button id="refreshBtn" class="btn btn-outline">
+      🔄 새로고침
+    </button>
+  </div>
+
+  <!-- 기계 목록 -->
+  <div class="machines-section" id="machinesSection" style="display: none;">
+    <div class="section-header">
+      <h2>🔧 기계 목록</h2>
+      <div class="filter-group">
+        <select id="statusFilter" class="form-control">
+          <option value="">전체 상태</option>
+          <option value="USABLE">사용 가능</option>
+          <option value="USING">사용 중</option>
+          <option value="RESERVING">예약 중</option>
+          <option value="UNUSABLE">사용 불가</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="machinesList" class="machines-grid">
+      <!-- JavaScript로 동적 로딩 -->
+    </div>
+  </div>
+
+  <!-- 로딩 스피너 -->
+  <div id="loading" class="loading-spinner" style="display: none;">
+    <div class="spinner"></div>
+    <p>기계 정보를 불러오는 중...</p>
+  </div>
+</div>
+
+<!-- 기계 등록 모달 (기존 스타일 유지) -->
+<div id="addMachineModal" class="modal" style="display: none;">
+  <div class="modal-overlay"></div>
+  <div class="modal-container">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>➕ 기계 등록</h2>
+        <button id="closeAddMachineModal" class="modal-close-btn" type="button">
+          <span>&times;</span>
+        </button>
+      </div>
+
+      <form id="addMachineForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="machineType" class="form-label">
+              <span class="label-icon">🔧</span>
+              기계 유형
+            </label>
+            <select id="machineType" name="machineType" class="form-select" required>
+              <option value="">기계 유형을 선택하세요</option>
+              <option value="WASHING">🌀 세탁기</option>
+              <option value="DRYING">🔥 건조기</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="machineCount" class="form-label">
+              <span class="label-icon">📊</span>
+              등록할 기계 수
+            </label>
+            <input type="number" id="machineCount" name="machineCount" min="1" max="10" value="1" class="form-select" required>
+          </div>
+
+          <div class="form-group">
+            <label for="notes" class="form-label">
+              <span class="label-icon">📝</span>
+              기계 설명
+            </label>
+            <textarea id="notes" name="notes"
+                      placeholder="기계에 대한 설명을 입력하세요 (선택사항)"
+                      class="form-textarea" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="window.hideAddMachineModal()">
+            <span class="btn-icon">❌</span>
+            취소
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <span class="btn-icon">✨</span>
+            등록
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 기계 수정 모달 -->
+<div id="editMachineModal" class="modal" style="display: none;">
+  <div class="modal-overlay"></div>
+  <div class="modal-container">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🔧 기계 정보 수정</h2>
+        <button id="closeEditMachineModal" class="modal-close-btn" type="button">
+          <span>&times;</span>
+        </button>
+      </div>
+
+      <form id="editMachineForm">
+        <input type="hidden" id="editMachineId" name="machineId">
+
+        <div class="modal-body">
+          <div class="form-group machine-info-group">
+            <label class="form-label">기계 정보</label>
+            <div id="editMachineInfo" class="machine-info-display">
+              🌀 세탁기 #1
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="editUsageStatus" class="form-label">
+              <span class="label-icon">📊</span>
+              사용 현황
+            </label>
+            <select id="editUsageStatus" name="usageStatus" class="form-select" required>
+              <option value="USABLE">✅ 사용 가능</option>
+              <option value="USING">🔄 사용 중</option>
+              <option value="RESERVING">⏰ 예약 중</option>
+              <option value="UNUSABLE">❌ 사용 불가</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="editNotes" class="form-label">
+              <span class="label-icon">📝</span>
+              설명
+            </label>
+            <textarea id="editNotes" name="notes" class="form-textarea"
+                      placeholder="기계에 대한 설명이나 특이사항을 입력하세요"
+                      rows="4"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="window.hideEditMachineModal()">
+            <span class="btn-icon">❌</span>
+            취소
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <span class="btn-icon">💾</span>
+            변경사항 저장
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script th:src="@{/js/owner-machines.js}"></script>
+</body>
+</html>

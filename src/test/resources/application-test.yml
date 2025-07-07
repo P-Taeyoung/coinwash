@@ -22,13 +22,17 @@ spring:
     redis:
       host: localhost
       port: 6379
-      password: zerobase
+      password: coinwashredis1015
+
+jwt:
+ secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
 
 logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
+# 환경변수 대신 테스트용 값 설정
 kakao:
   api:
-    key: ${KAKAO_API_KEY}
+    key: "test-kakao-api-key-for-testing-only"

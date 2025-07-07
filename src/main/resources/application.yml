@@ -2,6 +2,19 @@ spring:
   application:
     name: coinwash
 
+  # Thymeleaf 기본 설정
+  thymeleaf:
+    cache: false  # 개발용 - 템플릿 변경시 즉시 반영
+    encoding: UTF-8
+    mode: HTML
+    prefix: classpath:/templates/
+    suffix: .html
+
+  # 정적 리소스 설정
+  web:
+    resources:
+      static-locations: classpath:/static/
+
   datasource:
     # 🔧 Docker 서비스명 사용 + 환경변수로 동적 설정
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql:3306/coinwash?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul}

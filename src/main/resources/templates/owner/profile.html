@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>내 정보 - 코인워시</title>
+  <link th:href="@{/css/style.css}" rel="stylesheet">
+  <link th:href="@{/css/profile.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="profile-container">
+  <!-- 로딩 상태 -->
+  <div id="loadingState" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>정보를 불러오는 중...</p>
+  </div>
+
+  <!-- 에러 상태 -->
+  <div id="errorState" class="error-state" style="display: none;">
+    <div class="error-icon">⚠️</div>
+    <h3>정보를 불러올 수 없습니다</h3>
+    <p>다시 시도해주세요.</p>
+    <button onclick="loadOwnerProfile()" class="btn btn-primary">다시 시도</button>
+  </div>
+
+  <!-- 점주 프로필 -->
+  <div id="ownerProfile" class="profile-content" style="display: none;">
+    <!-- 프로필 헤더 -->
+    <section class="profile-hero">
+      <div class="profile-hero-content">
+        <h1>🏪 내 정보</h1>
+        <p class="profile-subtitle">점주 정보를 확인하고 수정할 수 있습니다</p>
+      </div>
+      <div class="profile-hero-icon">
+        <div class="user-icon">🏪</div>
+      </div>
+    </section>
+
+    <div class="container">
+      <!-- 기본 정보 섹션 -->
+      <section class="profile-section">
+        <div class="section-header">
+          <h2>📋 기본 정보</h2>
+          <button id="editBasicBtn" class="btn btn-outline">✏️ 수정</button>
+        </div>
+        <div class="info-grid">
+          <div class="info-card">
+            <div class="info-icon">👤</div>
+            <div class="info-content">
+              <label>이름</label>
+              <span id="ownerName" class="info-value">-</span>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-icon">📞</div>
+            <div class="info-content">
+              <label>전화번호</label>
+              <span id="ownerPhone" class="info-value">-</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 사업 관리 섹션 -->
+      <section class="profile-section">
+        <div class="section-header">
+          <h2>🏪 사업 관리</h2>
+        </div>
+        <div class="business-menu-grid">
+          <a th:href="@{/owner/laundries}" class="business-menu-card">
+            <div class="business-menu-icon">🏪</div>
+            <div class="business-menu-content">
+              <h3>세탁소 관리</h3>
+              <p>세탁소 정보를 관리합니다</p>
+            </div>
+            <div class="business-menu-arrow">→</div>
+          </a>
+          <a th:href="@{/owner/machines}" class="business-menu-card">
+            <div class="business-menu-icon">🔧</div>
+            <div class="business-menu-content">
+              <h3>기계 관리</h3>
+              <p>세탁기 정보를 관리합니다</p>
+            </div>
+            <div class="business-menu-arrow">→</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- 계정 관리 섹션 -->
+      <section class="profile-section danger-section">
+        <div class="section-header">
+          <h2>⚙️ 계정 관리</h2>
+        </div>
+        <div class="danger-zone">
+          <div class="danger-warning">
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-content">
+              <h4>회원 탈퇴</h4>
+              <p>탈퇴 시 세탁소 관리를 할 수 없습니다.</p>
+            </div>
+          </div>
+          <button id="deleteAccountBtn" class="btn btn-danger">
+            🗑️ 회원 탈퇴
+          </button>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<!-- 수정 모달 -->
+<div id="editModal" class="modal" style="display: none;">
+  <div class="modal-overlay"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalTitle">정보 수정</h3>
+      <button id="closeModal" class="close-btn">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="editForm">
+        <div class="form-group">
+          <label for="editPhone">📞 전화번호</label>
+          <input type="tel" id="editPhone" class="form-control" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="cancelEdit" class="btn btn-outline">취소</button>
+          <button type="submit" class="btn btn-primary">저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script th:src="@{/js/owner-profile.js}"></script>
+</body>
+</html>
