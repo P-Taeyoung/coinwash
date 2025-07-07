@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 import pp.coinwash.laundry.domain.entity.Laundry;
 
 public interface LaundryRepository extends JpaRepository<Laundry, Long> {
-	Page<Laundry> findByOwnerIdAndDeletedAtIsNull(long ownerId, Pageable pageable);
+	List<Laundry> findByOwnerIdAndDeletedAtIsNull(long ownerId);
 	Optional<Laundry> findByLaundryIdAndOwnerIdAndDeletedAtIsNull(long laundryId, long ownerId);
 
 

@@ -27,37 +27,7 @@ public class MachineManageApplication {
 	private final MachineRedisService redisService;
 	private final MachineManageService manageService;
 
-	@Transactional(readOnly = true)
-	public List<MachineResponseDto> getMachinesByLaundryId(long laundryId) {
-		//먼저 레디스에서 조회
-		try {
-			List<MachineResponseDto> redisResult = redisService.getMachinesByLaundryId(laundryId)
-				.stream()
-				.map(MachineResponseDto::fromRedis)
-				.toList();
 
-			// Redis에서 데이터가 있으면 반환
-			if (!redisResult.isEmpty()) {
-				return redisResult;
-			}
-
-			// Redis에 데이터가 없으면 DB에서 조회
-			log.info("세탁소 ID {}에 대한 Redis 데이터가 없어 DB에서 조회합니다", laundryId);
-			return manageService.getMachinesByLaundryId(laundryId);
-
-		} catch (RedisException e) {
-			// Redis 관련 예외만 처리
-			log.warn("세탁소 ID {}의 Redis 조회 중 오류 발생, DB로 대체 조회합니다. 오류: {}",
-				laundryId, e.getMessage());
-			return manageService.getMachinesByLaundryId(laundryId);
-
-		} catch (Exception e) {
-			// 예상치 못한 예외는 다시 던지기
-			log.error("세탁소 ID {}의 기계 정보 조회 중 예상치 못한 오류가 발생했습니다",
-				laundryId, e);
-			throw e;
-		}
-	}
 
 	@Transactional
 	public void registerMachines(List<MachineRegisterDto> dtos, long laundryId,long ownerId) {
@@ -78,6 +48,7 @@ public class MachineManageApplication {
 	@Transactional
 	public void updateMachine(MachineUpdateDto updateDto, long ownerId) {
 		try {
+			log.info("기계 수정 요청 데이터 : {}", updateDto);
 			Machine machine = manageService.updateMachine(updateDto, ownerId);
 
 			redisService.updateMachine(machine);

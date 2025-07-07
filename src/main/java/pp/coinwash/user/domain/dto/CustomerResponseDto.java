@@ -6,6 +6,7 @@ import pp.coinwash.user.domain.entity.Customer;
 @Builder
 public record CustomerResponseDto(
 	String id,
+	Long customerId,
 	String name,
 	String phone,
 	int points,
@@ -16,6 +17,7 @@ public record CustomerResponseDto(
 	public static CustomerResponseDto from(Customer customer) {
 		return CustomerResponseDto.builder()
 			.id(customer.getLoginId())
+			.customerId(customer.getCustomerId())
 			.name(customer.getName())
 			.phone(customer.getPhone())
 			.points(customer.getPoints())

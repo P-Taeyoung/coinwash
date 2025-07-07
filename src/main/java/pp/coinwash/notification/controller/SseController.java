@@ -3,6 +3,7 @@ package pp.coinwash.notification.controller;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,7 +29,7 @@ public class SseController {
 		tags = {"SSE 관리"},
 		description = "해당 API 요청을 통해 SSE 연결. 연결된 사용자는 실시간 알림을 받을 수 있음."
 	)
-	@PostMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public SseEmitter sseSubscribe(@AuthenticationPrincipal CustomUserDetails userDetails) {
 
 		return sseEmitterService.subscribe(userDetails.getUserId());
@@ -39,7 +40,7 @@ public class SseController {
 		tags = {"SSE 관리"},
 		description = "해당 API 요청을 통해 SSE 연결 해제. 정상적으로 SSE 연결을 해제"
 	)
-	@PostMapping("/unsubscribe")
+	@GetMapping("/unsubscribe")
 	public ResponseEntity<String> sseUnsubscribe(@AuthenticationPrincipal CustomUserDetails userDetails) {
 
 		sseEmitterService.unsubscribe(userDetails.getUserId());

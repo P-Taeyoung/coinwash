@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,10 +42,8 @@ class LaundryManageServiceTest {
 	private LaundryManageService laundryManageService;
 
 	private Laundry laundry;
-	private Laundry laundry2;
 	private LaundryRegisterDto registerDto;
 	private LaundryUpdateDto updateDto;
-	private LaundryResponseDto responseDto;
 
 
 	@BeforeEach
@@ -59,14 +58,6 @@ class LaundryManageServiceTest {
 			.opened(false)
 			.build();
 
-		laundry2 = Laundry.builder()
-			.laundryId(2)
-			.addressName("동대문구 회기동")
-			.location(geometryFactory.createPoint(new Coordinate(127.058338, 37.589288)))
-			.description("나냐너녀노뇨")
-			.opened(true)
-			.build();
-
 		registerDto = LaundryRegisterDto.builder()
 			.addressName("동대문구 회기동")
 			.latitude(37.600231)
@@ -76,16 +67,6 @@ class LaundryManageServiceTest {
 
 		updateDto = LaundryUpdateDto.builder()
 			.description("아야어여우유")
-			.build();
-
-		responseDto = LaundryResponseDto.builder()
-			.laundryId(1)
-			.ownerId(1)
-			.addressName("동대문구 중랑구")
-			.latitude(37.595040)
-			.longitude(127.078684)
-			.opened(false)
-			.description("가갸거겨고교")
 			.build();
 	}
 
@@ -123,19 +104,17 @@ class LaundryManageServiceTest {
 	void getLaundriesByOwnerId() {
 		//given
 		long ownerId = 1;
-		Pageable pageable = PageRequest.of(0, 10);
 		List<Laundry> laundries = List.of(laundry);
-		Page<Laundry> laundryPage = new PageImpl<>(laundries, pageable, laundries.size());
-		when(laundryRepository.findByOwnerIdAndDeletedAtIsNull(ownerId, pageable))
-			.thenReturn(laundryPage);
+		when(laundryRepository.findByOwnerIdAndDeletedAtIsNull(ownerId))
+			.thenReturn(laundries);
 
 		//when
-		PagedResponseDto<LaundryResponseDto> result = laundryManageService.getLaundriesByOwnerId(ownerId, pageable);
+		List<LaundryResponseDto> result = laundryManageService.getLaundriesByOwnerId(ownerId);
 
 		//then
-		verify(laundryRepository, times(1)).findByOwnerIdAndDeletedAtIsNull(ownerId, pageable);
-		assertEquals(PagedResponseDto.from(laundryPage.map(LaundryResponseDto::from)), result);
-		assertEquals(LaundryResponseDto.from(laundry), result.data().get(0));
+		verify(laundryRepository, times(1)).findByOwnerIdAndDeletedAtIsNull(ownerId);
+		assertEquals(laundries.stream().map(LaundryResponseDto::from).collect(Collectors.toList()), result);
+		assertEquals(LaundryResponseDto.from(laundry), result.get(0));
 	}
 
 	@DisplayName("세탁방 정보 수정")

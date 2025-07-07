@@ -1,5 +1,7 @@
 package pp.coinwash.laundry.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -51,12 +53,10 @@ public class LaundryManageController {
 		description = "점주 세탁소 정보를 조회, 점주가 담당하고 있는 세탁소 목록을 반환."
 	)
 	@GetMapping
-	public ResponseEntity<PagedResponseDto<LaundryResponseDto>> getLaundriesByOwnerId(
-		@AuthenticationPrincipal CustomUserDetails userDetails,
-		@PageableDefault(sort = "laundryId", direction = Sort.Direction.DESC)
-		Pageable pageable) {
+	public ResponseEntity<List<LaundryResponseDto>> getLaundriesByOwnerId(
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-		return ResponseEntity.ok(laundryManageService.getLaundriesByOwnerId(userDetails.getUserId(), pageable));
+		return ResponseEntity.ok(laundryManageService.getLaundriesByOwnerId(userDetails.getUserId()));
 	}
 
 	@Operation(

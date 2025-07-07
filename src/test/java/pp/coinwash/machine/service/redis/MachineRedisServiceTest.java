@@ -170,10 +170,10 @@ class MachineRedisServiceTest {
 		assertThat(machines)
 			.extracting(MachineRedisDto::getMachineId)
 			.containsExactlyInAnyOrder(1L, 2L);
-		assertThat(machines.get(0).getMachineId()).isEqualTo(testMachine.getMachineId());
-		assertThat(machines.get(1).getMachineId()).isEqualTo(machine2.getMachineId());
-		assertThat(machines.get(0).getUsageStatus()).isEqualTo(UsageStatus.USABLE);
-		assertThat(machines.get(1).getUsageStatus()).isEqualTo(UsageStatus.RESERVING);
+		assertThat(machines.get(1).getMachineId()).isEqualTo(testMachine.getMachineId());
+		assertThat(machines.get(0).getMachineId()).isEqualTo(machine2.getMachineId());
+		assertThat(machines.get(1).getUsageStatus()).isEqualTo(UsageStatus.USABLE);
+		assertThat(machines.get(0).getUsageStatus()).isEqualTo(UsageStatus.RESERVING);
 	}
 
 	@Test
@@ -199,11 +199,11 @@ class MachineRedisServiceTest {
 		assertThat(machines)
 			.extracting(MachineRedisDto::getMachineId)
 			.containsExactlyInAnyOrder(1L, 2L);
-		assertThat(machines.get(0).getMachineId()).isEqualTo(testMachine.getMachineId());
-		assertThat(machines.get(1).getMachineId()).isEqualTo(machine2.getMachineId());
-		assertThat(machines.get(0).getUsageStatus()).isEqualTo(UsageStatus.USABLE);
+		assertThat(machines.get(1).getMachineId()).isEqualTo(testMachine.getMachineId());
+		assertThat(machines.get(0).getMachineId()).isEqualTo(machine2.getMachineId());
 		assertThat(machines.get(1).getUsageStatus()).isEqualTo(UsageStatus.USABLE);
-		assertThat(machines.get(1).getEndTime()).isNull();
+		assertThat(machines.get(0).getUsageStatus()).isEqualTo(UsageStatus.USABLE);
+		assertThat(machines.get(0).getEndTime()).isNull();
 	}
 
 	//

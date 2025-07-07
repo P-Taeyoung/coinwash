@@ -1,7 +1,10 @@
 package pp.coinwash.machine.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -14,6 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import pp.coinwash.machine.application.MachineApplication;
+import pp.coinwash.machine.domain.dto.MachineResponseDto;
 import pp.coinwash.machine.domain.dto.UsingDryingDto;
 import pp.coinwash.machine.domain.dto.UsingWashingDto;
 import pp.coinwash.security.dto.CustomUserDetails;
@@ -25,6 +29,18 @@ import pp.coinwash.security.dto.CustomUserDetails;
 public class MachineController {
 
 	private final MachineApplication machineApplication;
+
+	@Operation(
+		summary = "기계 정보 조회",
+		tags = {"기계 관리"},
+		description = "특정 세탁소의 기계 정보 목록을 조회할 수 있도록 함."
+	)
+	@GetMapping
+	public ResponseEntity<List<MachineResponseDto>> getMachines(
+		@RequestParam long laundryId) {
+
+		return ResponseEntity.ok(machineApplication.getMachinesByLaundryId(laundryId));
+	}
 
 	@Operation(
 		summary = "세탁기 사용",
