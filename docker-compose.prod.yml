@@ -8,10 +8,9 @@ services:
       dockerfile: Dockerfile
     container_name: coinwash-app
     restart: unless-stopped
+    network_mode: "host"
     env_file:
       - .env.prod
-    ports:
-      - "80:8080"  # 웹 서비스용 80포트
     volumes:
       - ./logs:/app/logs
     # ✅ depends_on 제거 (외부 서비스라서 불필요)
