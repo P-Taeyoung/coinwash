@@ -9,7 +9,7 @@ echo "📍 Current branch: $CURRENT_BRANCH"
 
 # 최신 코드 가져오기
 echo "📥 Pulling latest code..."
-git pull origin main
+git pull origin master
 
 # 빌드
 echo "🔨 Building application..."
