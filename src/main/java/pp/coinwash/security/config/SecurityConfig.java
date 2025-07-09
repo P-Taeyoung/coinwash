@@ -50,12 +50,12 @@ public class SecurityConfig {
 		http
 			.authorizeHttpRequests(authorizeRequests ->
 				authorizeRequests
-					//TODO 허용할 경로 추가
-					.requestMatchers("/customer/signup", "/owner/signup", "/auth/**", "/", "/index").permitAll()
-					.requestMatchers("/css/**", "/js/**").permitAll()
 					// 페이지 접근은 허용 (토큰 검증은 API에서만)
-					.requestMatchers("/customer/**", "/owner/**").permitAll()
-					.requestMatchers("/api/*/signup", "/api/*/signin",
+					.requestMatchers( "/auth/**", "/", "/index", "/customer/**", "/owner/**").permitAll()
+					// UI 구성을 위한 파일 요청 경로 허용
+					.requestMatchers("/css/**", "/js/**").permitAll()
+					// api 요청 중 권한 허용
+					.requestMatchers("/api/*/signup", "/api/*/signin", "/actuator/health", "/api/sse/unsubscribe",
 						"/swagger-ui/**", "/v3/api-docs/**", "/favicon.ico", "/error", "/api/address").permitAll()
 					.requestMatchers("/api/owner/**").hasAuthority("OWNER")
 					.requestMatchers("/api/customer/**", "/api/point").hasAuthority("CUSTOMER")

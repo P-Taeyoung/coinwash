@@ -141,6 +141,7 @@ public class JwtFilter extends OncePerRequestFilter {
 			|| requestURI.startsWith("/swagger-resources")
 			|| requestURI.startsWith("/webjars/")
 			|| requestURI.equals("/favicon.ico")
+			|| requestURI.equals("/actuator/health")
 			|| requestURI.equals("/")
 			|| requestURI.equals("/api/address")
 			|| requestURI.startsWith("/login")
