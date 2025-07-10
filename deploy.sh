@@ -1,7 +1,11 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Starting deployment..."
+echo "🚀 Starting memory-optimized deployment for low-spec EC2..."
+
+# 메모리 상태 확인
+echo "📊 Current memory status:"
+free -h
 
 # 현재 브랜치 확인
 CURRENT_BRANCH=$(git branch --show-current)
@@ -11,29 +15,41 @@ echo "📍 Current branch: $CURRENT_BRANCH"
 echo "📥 Pulling latest code..."
 git pull origin master
 
-# 빌드
+# 🛑 Docker 컨테이너 중지 (메모리 확보)
+echo "🛑 Stopping containers to free memory..."
+docker compose -f docker-compose.prod.yml down
+
+# 🧹 적극적인 메모리 정리
+echo "🧹 Aggressive memory cleanup..."
+docker system prune -f --volumes
+sync
+echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null 2>&1 || true
+
+# 메모리 확인
+AVAILABLE_MEM=$(free -m | awk 'NR==2{printf "%.0f", $7}')
+echo "💾 Available memory: ${AVAILABLE_MEM}MB"
+
+if [ $AVAILABLE_MEM -lt 300 ]; then
+    echo "⚠️ Still low on memory. Consider adding swap or upgrading instance."
+fi
+
+# 🔨 빌드
 echo "🔨 Building application..."
 ./gradlew clean build -x test --no-daemon
 
-# 빌드 결과 확인
-if [ ! -f build/libs/coinwash-*.jar ]; then
-    echo "❌ Build failed - JAR file not found!"
-    exit 1
-fi
-
 echo "✅ Build successful!"
 
-# Docker 배포
-echo "🐳 Deploying with Docker..."
-docker compose -f docker-compose.prod.yml down
-docker compose -f docker-compose.prod.yml up --build
+# 🚀 Docker 컨테이너 시작
+echo "🐳 Starting containers..."
+docker compose -f docker-compose.prod.yml up -d --build
 
 # 배포 후 대기
 echo "⏳ Waiting for application to start..."
-sleep 15
+sleep 30
 
 # 상태 확인
-echo "📊 Checking status..."
+echo "📊 Final status check..."
 docker compose -f docker-compose.prod.yml ps
+free -h
 
-echo "🎉 Deployment finished!"
+echo "🎉 Memory-optimized deployment completed!"
