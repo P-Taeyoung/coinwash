@@ -25,8 +25,8 @@ echo "✅ Build successful!"
 
 # Docker 배포
 echo "🐳 Deploying with Docker..."
-docker-compose -f docker-compose.prod.yml down
-docker-compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml down
+docker compose -f docker-compose.prod.yml up --build
 
 # 배포 후 대기
 echo "⏳ Waiting for application to start..."
@@ -34,6 +34,6 @@ sleep 15
 
 # 상태 확인
 echo "📊 Checking status..."
-docker-compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml ps
 
 echo "🎉 Deployment finished!"
