@@ -13,7 +13,7 @@ git pull origin master
 
 # 빌드
 echo "🔨 Building application..."
-./gradlew clean build -x test
+./gradlew clean build -x test --no-daemon
 
 # 빌드 결과 확인
 if [ ! -f build/libs/coinwash-*.jar ]; then
