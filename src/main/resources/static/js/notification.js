@@ -147,7 +147,6 @@ class NotificationManager {
                 console.log('🔔 SSE 연결 성공!');
                 this.isConnected = true;
                 this.reconnectAttempts = 0;
-                this.showToast('success', '알림 연결', '실시간 알림이 활성화되었습니다.', 3000);
             };
 
             // 🔧 일반 메시지 리스너 (기존)
