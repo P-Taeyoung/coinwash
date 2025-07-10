@@ -341,15 +341,15 @@ function showReserveMachineModal(machineId, machineType) {
 function getCourseOptions(machineType) {
     if (machineType === 'WASHING') {
         return [
-            { value: 'WASHING_A_COURSE', name: '표준 세탁', points: 4000, description: '일반적인 세탁 (30분)' },
-            { value: 'WASHING_B_COURSE', name: '강력 세탁', points: 5000, description: '강력한 세탁 (45분)' },
-            { value: 'WASHING_C_COURSE', name: '울 세탁', points: 6000, description: '울 전용 세탁 (40분)' }
+            { value: 'WASHING_A_COURSE', name: '쾌속 세탁', points: 4000, description: '소량, 쾌속 세탁 (10분)' },
+            { value: 'WASHING_B_COURSE', name: '일반 세탁', points: 5000, description: '일반적인 세탁 (15분)' },
+            { value: 'WASHING_C_COURSE', name: '울 세탁', points: 6000, description: '울 전용 세탁 (20분)' }
         ];
     } else {
         return [
-            { value: 'DRYING_A_COURSE', name: '표준 건조', points: 3000, description: '일반적인 건조 (30분)' },
-            { value: 'DRYING_B_COURSE', name: '강력 건조', points: 4000, description: '강력한 건조 (45분)' },
-            { value: 'DRYING_C_COURSE', name: '저온 건조', points: 5000, description: '저온 건조 (50분)' }
+            { value: 'DRYING_A_COURSE', name: '쾌속 건조', points: 3000, description: '소량, 쾌속 건조 (10분)' },
+            { value: 'DRYING_B_COURSE', name: '일반 건조', points: 4000, description: '일반적인 건조 (15분)' },
+            { value: 'DRYING_C_COURSE', name: '저온 건조', points: 5000, description: '섬세 섬유 건조 (20분)' }
         ];
     }
 }
