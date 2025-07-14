@@ -472,7 +472,7 @@ async function deleteMachine(machineId) {
     console.log('🗑️ 기계 삭제 요청:', machineId);
 
     try {
-        const response = await fetch(`/api/owner/machines/${machineId}`, {
+        const response = await fetch(`/api/owner/machines?machineId=${machineId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
