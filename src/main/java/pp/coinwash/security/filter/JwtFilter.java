@@ -136,10 +136,10 @@ public class JwtFilter extends OncePerRequestFilter {
 	}
 
 	private boolean isExcludedPath(String requestURI) {
-		return requestURI.startsWith("/swagger-ui/")
-			|| requestURI.startsWith("/v3/api-docs/")
+		return requestURI.startsWith("/swagger-ui")
+			|| requestURI.startsWith("/v3/api-docs")
 			|| requestURI.startsWith("/swagger-resources")
-			|| requestURI.startsWith("/webjars/")
+			|| requestURI.startsWith("/webjars")
 			|| requestURI.equals("/favicon.ico")
 			|| requestURI.equals("/")
 			|| requestURI.equals("/api/address")
