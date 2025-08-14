@@ -30,8 +30,7 @@ public class MachineRedisService {
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final MachineRepository machineRepository;
 
-	private static final String MACHINE_KEY_PREFIX = "machine:";
-	// ⭐ Hash 구조로 변경: laundry:machines:{laundryId} -> Hash(machineId -> MachineRedisDto)
+	// Hash 구조로 변경: laundry:machines:{laundryId} -> Hash(machineId -> MachineRedisDto)
 	private static final String LAUNDRY_MACHINES_HASH_PREFIX = "laundry:machines:";
 
 	@EventListener(ApplicationReadyEvent.class)
@@ -69,20 +68,10 @@ public class MachineRedisService {
 		if (!machineMap.isEmpty()) {
 			redisTemplate.opsForHash().putAll(hashKey, machineMap);
 		}
-
-		// 개별 키도 유지 (기존 로직 호환성을 위해)
-		for (Machine machine : machines) {
-			String machineKey = MACHINE_KEY_PREFIX + machine.getMachineId();
-			redisTemplate.opsForValue().set(machineKey, MachineRedisDto.from(machine));
-		}
 	}
 
 	public void saveMachineToRedis(Machine machine) {
 		MachineRedisDto dto = MachineRedisDto.from(machine);
-
-		// 개별 키 저장 (기존 로직)
-		String machineKey = MACHINE_KEY_PREFIX + machine.getMachineId();
-		redisTemplate.opsForValue().set(machineKey, dto);
 
 		// Hash에도 저장
 		String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + machine.getLaundry().getLaundryId();
@@ -116,7 +105,8 @@ public class MachineRedisService {
 		Map<String, Object> toUpdate = new HashMap<>();
 
 		for (Object value : values) {
-			if (!(value instanceof MachineRedisDto dto)) continue;
+			if (!(value instanceof MachineRedisDto dto))
+				continue;
 
 			if (needsReset(dto, now)) {
 				dto.reset();
@@ -160,7 +150,8 @@ public class MachineRedisService {
 		Map<String, Object> toUpdate = new HashMap<>();
 
 		for (Object value : values) {
-			if (!(value instanceof MachineRedisDto dto)) continue;
+			if (!(value instanceof MachineRedisDto dto))
+				continue;
 
 			if (needsReset(dto, now)) {
 				dto.reset();
@@ -169,7 +160,7 @@ public class MachineRedisService {
 			result.add(dto);
 		}
 
-		// ⭐ 비동기로 업데이트 (조회 성능에 영향 없음)
+		// 비동기로 업데이트 (조회 성능에 영향 없음)
 		if (!toUpdate.isEmpty()) {
 			CompletableFuture.runAsync(() -> {
 				try {
@@ -187,31 +178,18 @@ public class MachineRedisService {
 	public void updateMachine(Machine machine) {
 		MachineRedisDto dto = MachineRedisDto.from(machine);
 
-		// 개별 키 업데이트
-		String machineKey = MACHINE_KEY_PREFIX + machine.getMachineId();
-		redisTemplate.opsForValue().set(machineKey, dto);
-
-		// Hash도 업데이트
+		// Hash 업데이트
 		String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + machine.getLaundry().getLaundryId();
 		redisTemplate.opsForHash().put(hashKey, machine.getMachineId().toString(), dto);
 	}
 
-	public void deleteMachine(long machineId) {
-		String machineKey = MACHINE_KEY_PREFIX + machineId;
+	public void deleteMachine(Machine machine) {
+		long laundryId = machine.getLaundry().getLaundryId();
 
-		// 삭제 전에 laundryId 조회
-		MachineRedisDto dto = (MachineRedisDto) redisTemplate.opsForValue().get(machineKey);
-
-		if (dto != null && dto.getLaundryId() != null) {
-			// Hash에서 삭제
-			String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + dto.getLaundryId();
-			redisTemplate.opsForHash().delete(hashKey, String.valueOf(machineId));
-			log.debug("Hash에서 기계 삭제: laundryId={}, machineId={}", dto.getLaundryId(), machineId);
-		}
-
-		// 개별 키 삭제
-		redisTemplate.delete(machineKey);
-		log.debug("개별 키 삭제: machineId={}", machineId);
+		// Hash에서 삭제
+		String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + laundryId;
+		redisTemplate.opsForHash().delete(hashKey, String.valueOf(machine.getMachineId()));
+		log.debug("Hash에서 기계 삭제: laundryId={}, machineId={}",laundryId, machine.getMachineId());
 	}
 
 	public void useMachine(Machine machine) {
@@ -233,17 +211,15 @@ public class MachineRedisService {
 		MachineRedisDto dto = getMachineRedisDto(machine);
 		updater.accept(dto);
 
-		// 개별 키와 Hash 모두 업데이트
-		String machineKey = MACHINE_KEY_PREFIX + machine.getMachineId();
+		// Hash 업데이트
 		String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + machine.getLaundry().getLaundryId();
-
-		redisTemplate.opsForValue().set(machineKey, dto);
 		redisTemplate.opsForHash().put(hashKey, machine.getMachineId().toString(), dto);
 	}
 
 	private MachineRedisDto getMachineRedisDto(Machine machine) {
-		String machineKey = MACHINE_KEY_PREFIX + machine.getMachineId();
-		MachineRedisDto dto = (MachineRedisDto) redisTemplate.opsForValue().get(machineKey);
+		String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + machine.getLaundry().getLaundryId();
+		MachineRedisDto dto = (MachineRedisDto)redisTemplate.opsForHash()
+			.get(hashKey, machine.getMachineId().toString());
 
 		if (dto == null) {
 			log.warn("Redis에서 기계 데이터 누락 감지, 재생성: machineId={}", machine.getMachineId());
