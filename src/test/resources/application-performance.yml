@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: coinwash
+
+  datasource:
+    # 🔧 환경변수 우선, 없으면 localhost 사용
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/coinwash?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${SPRING_DATASOURCE_USERNAME:user}  # 🔧 테스트용 기본값
+    password: ${MYSQL_PASSWORD:coinwashmysql1015}              # 🔧 테스트용 기본값
+    hikari:
+      maximum-pool-size: 100      # 30 → 100 (3배 증가)
+      minimum-idle: 50            # 15 → 50 (3배 증가)
+      connection-timeout: 10000   # 20초 → 10초 (빠른 실패)
+      idle-timeout: 180000        # 5분 → 3분 (빠른 정리)
+      max-lifetime: 900000        # 30분 → 15분 (빠른 갱신)
+      leak-detection-threshold: 30000  # 60초 → 30초 (빠른 감지)
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+
+  jwt:
+    secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
+
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}     # 🔧 테스트용 기본값
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:coinwashredis1015}  # 🔧 테스트용 기본값
+      timeout: 1000ms           # 2초 → 1초 (빠른 응답)
+      connect-timeout: 2000ms   # 3초 → 2초 (빠른 연결)
+      lettuce:
+        shutdown-timeout: 1000ms  # 2초 → 1초 (빠른 종료)
+        pool:
+          max-active: 2000        # 200 → 2000 (10배 증가)
+          max-idle: 500           # 50 → 500 (10배 증가)
+          min-idle: 100           # 5 → 100 (20배 증가)
+          max-wait: 5000ms        # 1초 → 5초 (여유 확보)
+
+          # 🔧 성능 최적화 추가
+          test-on-borrow: false   # 빌릴 때 테스트 생략 (속도 향상)
+          test-on-return: false   # 반납 시 테스트 생략
+          test-while-idle: true   # 유휴 시에만 테스트
+
+          time-between-eviction-runs: 10000ms  # 10초마다 정리
+          min-evictable-idle-time: 30000ms     # 30초 유휴 시 제거
+
+kakao:
+  api:
+    key: ${KAKAO_API_KEY:70a4efa03827692eeda13eea1c434f88}
+
+server:
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    max-connections: 8192
+    connection-timeout: 20000

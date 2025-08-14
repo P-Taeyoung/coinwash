@@ -24,8 +24,8 @@ spring:
       port: 6379
       password: coinwashredis1015
 
-jwt:
- secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
+  jwt:
+   secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
 
 logging:
   level:
