@@ -1,6 +1,9 @@
 package pp.coinwash.machine.application;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -33,29 +36,64 @@ public class MachineApplication {
 
 	@Transactional(readOnly = true)
 	public List<MachineResponseDto> getMachinesByLaundryId(long laundryId) {
+		long apiStart = System.nanoTime();
 		//먼저 레디스에서 조회
 		try {
-			List<MachineResponseDto> redisResult = redisService.getMachinesByLaundryId(laundryId)
+			//응답속도 체크를 위한 시간 데이터
+			long redisStart = System.nanoTime();
+
+			List<MachineResponseDto> redisResult = redisService.getMachinesByLaundryIdAsync(laundryId)
 				.stream()
 				.map(MachineResponseDto::fromRedis)
 				.toList();
+			long redisEnd = System.nanoTime();
+			log.info("[perf] phase=redisFetch laundryId={} size={} timeMs={}",
+				laundryId,
+				redisResult.size(),
+				String.format("%.3f", (redisEnd - redisStart)/1_000_000.0));
 
 			log.info("기기 조회 데이터 : {}", redisResult);
 
 			// Redis에서 데이터가 있으면 반환
 			if (!redisResult.isEmpty()) {
+				log.info("[perf] phase=apiTotal laundryId={} source=REDIS timeMs={}",
+					laundryId,
+					String.format("%.3f", (System.nanoTime() - apiStart)/1_000_000.0));
 				return redisResult;
 			}
 
 			// Redis에 데이터가 없으면 DB에서 조회
 			log.info("세탁소 ID {}에 대한 Redis 데이터가 없어 DB에서 조회합니다", laundryId);
-			return manageService.getMachinesByLaundryId(laundryId);
+			long dbStart = System.nanoTime();
+			List<MachineResponseDto> dbResult = manageService.getMachinesByLaundryId(laundryId);
+			long dbEnd = System.nanoTime();
+			log.info("[perf] phase=dbFetch laundryId={} size={} timeMs={}",
+				laundryId,
+				dbResult.size(),
+				String.format("%.3f", (dbEnd - dbStart)/1_000_000.0));
+
+			log.info("[perf] phase=apiTotal laundryId={} source=DB timeMs={}",
+				laundryId,
+				String.format("%.3f", (System.nanoTime() - apiStart)/1_000_000.0));
+
+			return dbResult;
 
 		} catch (RedisException e) {
 			// Redis 관련 예외만 처리
+			long fallbackStart = System.nanoTime();
 			log.warn("세탁소 ID {}의 Redis 조회 중 오류 발생, DB로 대체 조회합니다. 오류: {}",
 				laundryId, e.getMessage());
-			return manageService.getMachinesByLaundryId(laundryId);
+			List<MachineResponseDto> dbResult = manageService.getMachinesByLaundryId(laundryId);
+			long fallbackEnd = System.nanoTime();
+			log.info("[perf] phase=redisError fallback=dbFetch laundryId={} size={} dbTimeMs={}",
+				laundryId,
+				dbResult.size(),
+				String.format("%.3f", (fallbackEnd - fallbackStart)/1_000_000.0));
+			log.info("[perf] phase=apiTotal laundryId={} source=DB_FALLBACK timeMs={}",
+				laundryId,
+				String.format("%.3f", (System.nanoTime() - apiStart)/1_000_000.0));
+			return dbResult;
+
 
 		} catch (Exception e) {
 			// 예상치 못한 예외는 다시 던지기
@@ -118,5 +156,75 @@ public class MachineApplication {
 			log.error("기계 {} Redis 데이터 업데이트 실패로 전체 롤백", machineId, e);
 			throw new CustomException(ErrorCode.FAILED_TO_CHANGE_MACHINE_STATUS);
 		}
+	}
+
+	//성능 테스트용: Redis에서만 조회
+	@Transactional(readOnly = true)
+	public List<MachineResponseDto> getMachinesFromRedisOnly(long laundryId) {
+		long start = System.nanoTime();
+
+		try {
+			List<MachineResponseDto> result = redisService.getMachinesByLaundryIdAsync(laundryId)
+				.stream()
+				.map(MachineResponseDto::fromRedis)
+				.toList();
+
+			long end = System.nanoTime();
+			log.debug("[perf-test] Redis전용조회 laundryId={} size={} timeMs={}",
+				laundryId, result.size(), String.format("%.3f", (end - start)/1_000_000.0));
+
+			return result;
+
+		} catch (Exception e) {
+			log.warn("Redis 전용 조회 실패 - laundryId: {}, error: {}", laundryId, e.getMessage());
+			return Collections.emptyList();
+		}
+	}
+
+	// 성능 테스트용: MySQL에서만 조회
+	@Transactional(readOnly = true)
+	public List<MachineResponseDto> getMachinesFromMySQLOnly(long laundryId) {
+		long start = System.nanoTime();
+
+		try {
+			List<MachineResponseDto> result = manageService.getMachinesByLaundryId(laundryId);
+
+			long end = System.nanoTime();
+			log.debug("[perf-test] MySQL전용조회 laundryId={} size={} timeMs={}",
+				laundryId, result.size(), String.format("%.3f", (end - start)/1_000_000.0));
+
+			return result;
+
+		} catch (Exception e) {
+			log.error("MySQL 전용 조회 실패 - laundryId: {}", laundryId, e);
+			throw e;
+		}
+	}
+
+	// 성능 테스트용: Redis 캐시 통계 정보
+	public Map<String, Object> getRedisStats(List<Long> laundryIds) {
+		Map<String, Object> stats = new HashMap<>();
+		int totalLaundries = laundryIds.size();
+		int cachedLaundries = 0;
+		int totalMachines = 0;
+
+		for (Long laundryId : laundryIds) {
+			try {
+				List<MachineResponseDto> machines = getMachinesFromRedisOnly(laundryId);
+				if (!machines.isEmpty()) {
+					cachedLaundries++;
+					totalMachines += machines.size();
+				}
+			} catch (Exception e) {
+				log.debug("세탁소 {} 통계 수집 실패", laundryId);
+			}
+		}
+
+		stats.put("totalLaundries", totalLaundries);
+		stats.put("cachedLaundries", cachedLaundries);
+		stats.put("cacheHitRate", (double) cachedLaundries / totalLaundries * 100);
+		stats.put("totalCachedMachines", totalMachines);
+
+		return stats;
 	}
 }
