@@ -106,7 +106,7 @@ class MachineManageApplicationTest {
 
 		// Then
 		verify(manageService).deleteMachine(machineId, ownerId);
-		verify(redisService).deleteMachine(machineId); // Redis 삭제 확인
+		verify(redisService).deleteMachine(machine); // Redis 삭제 확인
 	}
 
 }

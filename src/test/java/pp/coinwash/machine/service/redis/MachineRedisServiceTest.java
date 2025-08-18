@@ -138,7 +138,7 @@ class MachineRedisServiceTest {
 		machineRedisService.saveMachineToRedis(testMachine);
 
 		// when
-		machineRedisService.deleteMachine(testMachine.getMachineId());
+		machineRedisService.deleteMachine(testMachine);
 
 		// then
 		String machineKey = "machine:" + testMachine.getMachineId();

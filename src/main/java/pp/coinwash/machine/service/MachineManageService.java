@@ -67,8 +67,12 @@ public class MachineManageService {
 	}
 
 	@Transactional
-	public void deleteMachine(long machineId, long ownerId) {
-		getValidateMachine(machineId, ownerId).delete();
+	public Machine deleteMachine(long machineId, long ownerId) {
+		Machine machine =  getValidateMachine(machineId, ownerId);
+
+		machine.delete();
+
+		return machine;
 	}
 
 

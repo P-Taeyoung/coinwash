@@ -36,9 +36,9 @@ public class RedisConfig {
 			ObjectMapper.DefaultTyping.NON_FINAL
 		);
 
-		// ⭐ JSR310 모듈 등록 (LocalDateTime 등 Java 8 날짜/시간 타입 지원)
+		//JSR310 모듈 등록 (LocalDateTime 등 Java 8 날짜/시간 타입 지원)
 		objectMapper.registerModule(new JavaTimeModule());
-		// ⭐ 날짜를 타임스탬프가 아닌 ISO 형식으로 직렬화
+		//날짜를 타임스탬프가 아닌 ISO 형식으로 직렬화
 		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
 		// 생성자에서 ObjectMapper를 직접 전달

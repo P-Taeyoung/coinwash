@@ -62,9 +62,9 @@ public class MachineManageApplication {
 	@Transactional
 	public void deleteMachine(long machineId, long ownerId) {
 		try {
-			manageService.deleteMachine(machineId, ownerId);
+			Machine machine = manageService.deleteMachine(machineId, ownerId);
 
-			redisService.deleteMachine(machineId);
+			redisService.deleteMachine(machine);
 
 		} catch (RedisException e) {
 			log.error("기계 {} Redis 데이터 삭제 실패로 전체 롤백", machineId, e);
