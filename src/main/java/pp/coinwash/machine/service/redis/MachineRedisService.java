@@ -12,8 +12,12 @@ import java.util.stream.Collectors;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +31,13 @@ import pp.coinwash.machine.domain.type.UsageStatus;
 @RequiredArgsConstructor
 public class MachineRedisService {
 
-	private final RedisTemplate<String, Object> redisTemplate;
+	private final StringRedisTemplate redisTemplate;
 	private final MachineRepository machineRepository;
+	private final ObjectMapper objectMapper;
 
 	// Hash 구조로 변경: laundry:machines:{laundryId} -> Hash(machineId -> MachineRedisDto)
 	private static final String LAUNDRY_MACHINES_HASH_PREFIX = "laundry:machines:";
+	private final ObjectMapper redisObjectMapper;
 
 	@EventListener(ApplicationReadyEvent.class)
 	@Transactional(readOnly = true)
@@ -59,10 +65,17 @@ public class MachineRedisService {
 	private void saveMachinesHashToRedis(Long laundryId, List<Machine> machines) {
 		String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + laundryId;
 
-		Map<String, Object> machineMap = machines.stream()
+		Map<String, String> machineMap = machines.stream()
 			.collect(Collectors.toMap(
 				m -> m.getMachineId().toString(),
-				MachineRedisDto::from
+				m -> {
+					try	{
+						return redisObjectMapper.writeValueAsString(MachineRedisDto.from(m));
+					} catch (Exception e) {
+						log.error("기계 직렬화 실패: machineId={}", m.getMachineId(), e);
+						return "{}";
+					}
+				}
 			));
 
 		if (!machineMap.isEmpty()) {
@@ -71,11 +84,16 @@ public class MachineRedisService {
 	}
 
 	public void saveMachineToRedis(Machine machine) {
-		MachineRedisDto dto = MachineRedisDto.from(machine);
+		try {
+			MachineRedisDto dto = MachineRedisDto.from(machine);
+			String json = redisObjectMapper.writeValueAsString(dto);
 
-		// Hash에도 저장
-		String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + machine.getLaundry().getLaundryId();
-		redisTemplate.opsForHash().put(hashKey, machine.getMachineId().toString(), dto);
+			String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + machine.getLaundry().getLaundryId();
+			redisTemplate.opsForHash().put(hashKey, machine.getMachineId(), json);
+
+		} catch (Exception e) {
+			log.error("기계 저장 실패: machineId={}", machine.getMachineId(), e);
+		}
 	}
 
 	// 핵심 최적화: Hash 기반 조회
@@ -102,17 +120,22 @@ public class MachineRedisService {
 		long eStart = System.nanoTime();
 		LocalDateTime now = LocalDateTime.now();
 		List<MachineRedisDto> result = new ArrayList<>();
-		Map<String, Object> toUpdate = new HashMap<>();
+		Map<String, String> toUpdate = new HashMap<>();
 
 		for (Object value : values) {
-			if (!(value instanceof MachineRedisDto dto))
-				continue;
+			try {
+				String json = value.toString();
+				MachineRedisDto dto = redisObjectMapper.readValue(json, MachineRedisDto.class);
 
-			if (needsReset(dto, now)) {
-				dto.reset();
-				toUpdate.put(dto.getMachineId().toString(), dto);
+				if (needsReset(dto, now)) {
+					dto.reset();
+					toUpdate.put(dto.getMachineId().toString(), redisObjectMapper.writeValueAsString(dto));
+				}
+
+				result.add(dto);
+			} catch (Exception e) {
+				log.error("JSON 파싱 실패: value={}", value, e);
 			}
-			result.add(dto);
 		}
 		long eEnd = System.nanoTime();
 
@@ -147,17 +170,22 @@ public class MachineRedisService {
 
 		LocalDateTime now = LocalDateTime.now();
 		List<MachineRedisDto> result = new ArrayList<>();
-		Map<String, Object> toUpdate = new HashMap<>();
+		Map<String, String> toUpdate = new HashMap<>();
 
 		for (Object value : values) {
-			if (!(value instanceof MachineRedisDto dto))
-				continue;
+			try {
+				String json = value.toString();
+				MachineRedisDto dto = redisObjectMapper.readValue(json, MachineRedisDto.class);
 
-			if (needsReset(dto, now)) {
-				dto.reset();
-				toUpdate.put(dto.getMachineId().toString(), dto);
+				if (needsReset(dto, now)) {
+					dto.reset();
+					toUpdate.put(dto.getMachineId().toString(), redisObjectMapper.writeValueAsString(dto));
+				}
+
+				result.add(dto);
+			} catch (Exception e) {
+				log.error("JSON 파싱 실패: value={}", value, e);
 			}
-			result.add(dto);
 		}
 
 		// 비동기로 업데이트 (조회 성능에 영향 없음)
@@ -176,11 +204,15 @@ public class MachineRedisService {
 	}
 
 	public void updateMachine(Machine machine) {
-		MachineRedisDto dto = MachineRedisDto.from(machine);
+		try {
+			MachineRedisDto dto = MachineRedisDto.from(machine);
+			String json = redisObjectMapper.writeValueAsString(dto);
 
-		// Hash 업데이트
-		String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + machine.getLaundry().getLaundryId();
-		redisTemplate.opsForHash().put(hashKey, machine.getMachineId().toString(), dto);
+			String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + machine.getLaundry().getLaundryId();
+			redisTemplate.opsForHash().put(hashKey, machine.getMachineId().toString(), json);
+		} catch (Exception e) {
+			log.error("기계 업데이트 실패: machineId={}", machine.getMachineId(), e);
+		}
 	}
 
 	public void deleteMachine(Machine machine) {
@@ -208,24 +240,35 @@ public class MachineRedisService {
 
 	// 상태 업데이트 로직 통합
 	private void updateMachineState(Machine machine, Consumer<MachineRedisDto> updater) {
-		MachineRedisDto dto = getMachineRedisDto(machine);
-		updater.accept(dto);
+		try {
+			MachineRedisDto dto = getMachineRedisDto(machine);
+			updater.accept(dto);
 
-		// Hash 업데이트
-		String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + machine.getLaundry().getLaundryId();
-		redisTemplate.opsForHash().put(hashKey, machine.getMachineId().toString(), dto);
+			String json = redisObjectMapper.writeValueAsString(dto);
+			String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + machine.getLaundry().getLaundryId();
+			redisTemplate.opsForHash().put(hashKey, dto.getMachineId().toString(), json);
+
+		} catch (Exception e) {
+			log.error("기계 상태 업데이트 실패: machineId={}", machine.getMachineId(), e);
+		}
 	}
 
 	private MachineRedisDto getMachineRedisDto(Machine machine) {
-		String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + machine.getLaundry().getLaundryId();
-		MachineRedisDto dto = (MachineRedisDto)redisTemplate.opsForHash()
-			.get(hashKey, machine.getMachineId().toString());
+		try {
+			String hashKey = LAUNDRY_MACHINES_HASH_PREFIX + machine.getLaundry().getLaundryId();
+			String json = (String) redisTemplate.opsForHash().get(hashKey, machine.getMachineId().toString());
 
-		if (dto == null) {
-			log.warn("Redis에서 기계 데이터 누락 감지, 재생성: machineId={}", machine.getMachineId());
+			if (json == null) {
+				log.warn("Redis에서 기계 데이터 누락 감지, 재생성: machineId={}", machine.getMachineId());
+				return MachineRedisDto.from(machine);
+			}
+
+			return redisObjectMapper.readValue(json, MachineRedisDto.class);
+
+		} catch (Exception e) {
+			log.error("기계 데이터 조회 실패: machineId={}", machine.getMachineId(), e);
 			return MachineRedisDto.from(machine);
 		}
-		return dto;
 	}
 
 	private boolean needsReset(MachineRedisDto dto, LocalDateTime now) {
