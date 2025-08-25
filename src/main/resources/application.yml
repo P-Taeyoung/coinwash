@@ -23,18 +23,19 @@ spring:
     password: ${MYSQL_PASSWORD}
     hikari:
       # 🎯 성능 개선
-      maximum-pool-size: 15
-      minimum-idle: 5
-      connection-timeout: 20000
+      maximum-pool-size: 100
+      minimum-idle: 50
+      connection-timeout: 10000
 
       # 🔍 모니터링 활성화
       register-mbeans: true
-      leak-detection-threshold: 60000
+      leak-detection-threshold: 30000
 
       # 🔧 추가 최적화 옵션들
-      idle-timeout: 300000          # 5분 (기본 10분보다 짧게)
-      max-lifetime: 900000          # 15분 (기본 30분보다 짧게)
-      validation-timeout: 5000      # 5초 (기본값)
+      idle-timeout: 180000
+      max-lifetime: 900000
+      validation-timeout: 5000
+
 
   jpa:
     show-sql: true
@@ -50,16 +51,22 @@ spring:
       host: ${REDIS_HOST:redis}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD}
-      timeout: 20000ms
-      connect-timeout: 5000ms
+      timeout: 1000ms
+      connect-timeout: 2000ms
       lettuce:
+        shutdown-timeout: 1000ms
         pool:
-          max-active: 100
-          max-idle: 50
-          min-idle: 5
-          max-wait: 3000ms
-        shutdown-timeout: 100ms
+          max-active: 2000
+          max-idle: 500
+          min-idle: 100
+          max-wait: 5000ms
 
+          test-on-borrow: false
+          test-on-return: false
+          test-while-idle: true
+
+          time-between-eviction-runs: 10000ms  # 30초로 증가
+          min-evictable-idle-time: 30000ms     # 1분으로 증가
 
 kakao:
   api:
