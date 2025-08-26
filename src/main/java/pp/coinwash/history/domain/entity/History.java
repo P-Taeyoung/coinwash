@@ -2,6 +2,7 @@ package pp.coinwash.history.domain.entity;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -9,8 +10,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,6 +28,11 @@ import pp.coinwash.history.domain.dto.HistoryRequestDto;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(
+	indexes = {
+		@Index(name = "idx_customerId", columnList = "customerId")
+	}
+)
 public class History extends BaseEntity {
 
 	@Id
@@ -35,7 +43,7 @@ public class History extends BaseEntity {
 	@JoinColumn(name = "machine_id", nullable = false)
 	private Machine machine;
 
-	//TODO 추후 인덱스 설정 추가
+	@Column(nullable = false)
 	private long customerId;
 
 	//예약 or 사용 내역

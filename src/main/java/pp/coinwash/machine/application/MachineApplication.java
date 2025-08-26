@@ -39,7 +39,7 @@ public class MachineApplication {
 		long apiStart = System.nanoTime();
 		//먼저 레디스에서 조회
 		try {
-			//응답속도 체크를 위한 시간 데이터
+			// 응답속도 체크를 위한 시간 데이터
 			long redisStart = System.nanoTime();
 
 			List<MachineResponseDto> redisResult = redisService.getMachinesByLaundryIdAsync(laundryId)
